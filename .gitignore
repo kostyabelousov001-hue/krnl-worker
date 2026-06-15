@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+.DS_Store
+user_data*/
+browser-automation/user_data*/
+browser-automation/test_out.txt
+browser-automation/test_err.txt
+ios-worker/build/
+ios-worker/*.xcworkspace/
+ios-worker/*.xcodeproj/

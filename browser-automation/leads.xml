@@ -1,0 +1,883 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<leads>
+  <lead id="1">
+    <name>Christie’s International Real Estate Dubai</name>
+    <rating>4.9</rating>
+    <reviews>14</reviews>
+    <phone>+971 4 585 9074</phone>
+    <website>christiesrealestatedubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="2">
+    <name>Metropolitan Premium Properties</name>
+    <rating>4.7</rating>
+    <reviews>629</reviews>
+    <phone>+971 58 648 8888</phone>
+    <website>metropolitan.realestate</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="3">
+    <name>Union Square House Real Estate</name>
+    <rating>4.8</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 458 9090</phone>
+    <website>ushre.com</website>
+    <emails>info@ushre.com</emails>
+  </lead>
+  <lead id="4">
+    <name>Dacha - Real Estate Agents in Dubai Marina</name>
+    <rating>4.8</rating>
+    <reviews>1448</reviews>
+    <phone>+971 4 423 2006</phone>
+    <website>dacha.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="5">
+    <name>Harbor Real Estate Broker LLC</name>
+    <rating>4.7</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 325 1616</phone>
+    <website>harbordubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="6">
+    <name>D&amp;B Properties</name>
+    <rating>4.9</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 871 9200</phone>
+    <website>dandbdubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="7">
+    <name>Next Level Real Estate - Award Winning Real Estate Agency in Dubai</name>
+    <rating>4.5</rating>
+    <reviews>116</reviews>
+    <phone>+971 4 454 2828</phone>
+    <website>nextlevelrealestate.ae</website>
+    <emails>media@nextlevelrealestate.ae</emails>
+  </lead>
+  <lead id="8">
+    <name>Espace</name>
+    <rating>4.7</rating>
+    <reviews>1097</reviews>
+    <phone>+971 4 306 9999</phone>
+    <website>espace.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="9">
+    <name>Abbasi One Real Estate Dubai</name>
+    <rating>5.0</rating>
+    <reviews>0</reviews>
+    <phone>+971 55 670 2723</phone>
+    <website>abbasione.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="10">
+    <name>HUAXIA REAL ESTATE BROKERS - DUBAI | 迪拜华夏地产</name>
+    <rating>4.5</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 589 7440</phone>
+    <website>huaxia.ae</website>
+    <emails>info@huaxia.ae</emails>
+  </lead>
+  <lead id="11">
+    <name>FIDU Properties</name>
+    <rating>4.5</rating>
+    <reviews>0</reviews>
+    <phone>+971 800 299</phone>
+    <website>fidudubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="12">
+    <name>Driven Properties LLC - HQ</name>
+    <rating>4.5</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 245 4800</phone>
+    <website>drivenproperties.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="13">
+    <name>Arabian Estates - Real Estate Agency Dubai</name>
+    <rating>4.8</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 324 3137</phone>
+    <website>arabianestates.ae</website>
+    <emails>info@arabianestates.ae</emails>
+  </lead>
+  <lead id="14">
+    <name>DRE (Homes Real Estate)</name>
+    <rating>4.5</rating>
+    <reviews>660</reviews>
+    <phone>+971 800 37373</phone>
+    <website>drehomes.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="15">
+    <name>Excel Properties | Top Real Estate Broker in Dubai since 2001</name>
+    <rating>4.7</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 336 4447</phone>
+    <website>excelproperties.ae</website>
+    <emails>inquiry@excelproperties.ae</emails>
+  </lead>
+  <lead id="16">
+    <name>Edge Realty Real Estate</name>
+    <rating>4.4</rating>
+    <reviews>31</reviews>
+    <phone>+971 50 243 9663</phone>
+    <website>edgerealty.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="17">
+    <name>Silver Keys Real Estate L.L.C - Real Estate Company in Dubai</name>
+    <rating>4.1</rating>
+    <reviews>0</reviews>
+    <phone>+971 55 533 9696</phone>
+    <website>silverkeys.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="18">
+    <name>REAL DUBAI - Lovisa Homes Real Estate Broker LLC</name>
+    <rating>5.0</rating>
+    <reviews>0</reviews>
+    <phone>N/A</phone>
+    <website>real-dubai.com</website>
+    <emails>hello@real-dubai.com</emails>
+  </lead>
+  <lead id="19">
+    <name>BSO - Real Estate Management LLC, Dubai, UAE</name>
+    <rating>4.5</rating>
+    <reviews>280</reviews>
+    <phone>+971 4 279 9100</phone>
+    <website>bso.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="20">
+    <name>Tribeca Real Estate LLC</name>
+    <rating>4.8</rating>
+    <reviews>0</reviews>
+    <phone>+971 55 227 1845</phone>
+    <website>tribecadubai.com</website>
+    <emails>info@tribecadubai.com, mail@example.com</emails>
+  </lead>
+  <lead id="21">
+    <name>Strada Real Estate Brokerage</name>
+    <rating>4.8</rating>
+    <reviews>296</reviews>
+    <phone>+971 4 547 6400</phone>
+    <website>stradauae.com</website>
+    <emails>taha@seven52creative.com, info@stradauae.com</emails>
+  </lead>
+  <lead id="22">
+    <name>House &amp; Hedges Real Estate - Head Office</name>
+    <rating>4.7</rating>
+    <reviews>412</reviews>
+    <phone>+971 52 336 2441</phone>
+    <website>houseandhedges.ae</website>
+    <emails>info@houseandhedges.ae, hassan@houseandhedges.ae, jamie@houseandhedges.ae, handa@houseandhedges.ae, muhammadusman@houseandhedges.ae</emails>
+  </lead>
+  <lead id="23">
+    <name>Luxfolio Real Estate</name>
+    <rating>4.6</rating>
+    <reviews>388</reviews>
+    <phone>+971 4 335 6007</phone>
+    <website>luxfoliorealestate.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="24">
+    <name>K Estates Dubai</name>
+    <rating>4.9</rating>
+    <reviews>88</reviews>
+    <phone>+971 4 529 9724</phone>
+    <website>N/A</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="25">
+    <name>Skyline International Real Estate Dubai</name>
+    <rating>4.9</rating>
+    <reviews>38</reviews>
+    <phone>+971 56 563 4338</phone>
+    <website>skylineinternationalrealestate.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="26">
+    <name>Xperience​ Realty Real Estate</name>
+    <rating>4.9</rating>
+    <reviews>447</reviews>
+    <phone>+971 56 408 0888</phone>
+    <website>xrealty.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="27">
+    <name>ELITE Property Brokerage</name>
+    <rating>4.9</rating>
+    <reviews>332</reviews>
+    <phone>+971 4 770 1087</phone>
+    <website>elitepropertydxb.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="28">
+    <name>Homeland Realty Real Estate</name>
+    <rating>4.9</rating>
+    <reviews>213</reviews>
+    <phone>+971 55 661 0000</phone>
+    <website>homeland.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="29">
+    <name>Tree House Real Estate Dubai</name>
+    <rating>4.7</rating>
+    <reviews>39</reviews>
+    <phone>+971 4 554 8022</phone>
+    <website>thetreehousere.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="30">
+    <name>Vera Real Estate LLC</name>
+    <rating>4.8</rating>
+    <reviews>69</reviews>
+    <phone>+971 4 558 2006</phone>
+    <website>verare.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="31">
+    <name>Unique Zone Real Estate - Property for Rent and Sale in Dubai</name>
+    <rating>4.6</rating>
+    <reviews>57</reviews>
+    <phone>+971 55 269 7381</phone>
+    <website>uniquezone.realestate</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="32">
+    <name>99 Real Estate Brokers LLC</name>
+    <rating>4.9</rating>
+    <reviews>37</reviews>
+    <phone>+971 800 289</phone>
+    <website>99realestate.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="33">
+    <name>THE CAPITAL Dubai</name>
+    <rating>4.6</rating>
+    <reviews>21</reviews>
+    <phone>+971 4 608 6560</phone>
+    <website>thecapitaldubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="34">
+    <name>Seven Skys Real Estate Dubai</name>
+    <rating>4.4</rating>
+    <reviews>44</reviews>
+    <phone>+971 4 423 1104</phone>
+    <website>sevenskys.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="35">
+    <name>Forest Hills Dubai Real Estate</name>
+    <rating>4.4</rating>
+    <reviews>107</reviews>
+    <phone>+971 52 481 7846</phone>
+    <website>foresthillsdubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="36">
+    <name>Auric Acres Real Estate Brokers, Dubai, UAE</name>
+    <rating>4.7</rating>
+    <reviews>29</reviews>
+    <phone>+971 52 957 8280</phone>
+    <website>auric-acres.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="37">
+    <name>Emireum Properties | Real estate agency in dubai</name>
+    <rating>4.8</rating>
+    <reviews>21</reviews>
+    <phone>+971 4 410 7429</phone>
+    <website>emireumproperties.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="38">
+    <name>Smart Folks Real Estate Brokers</name>
+    <rating>4.8</rating>
+    <reviews>52</reviews>
+    <phone>+971 55 282 8039</phone>
+    <website>themegahub.in</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="39">
+    <name>Alexander Kaminsky Real Estate</name>
+    <rating>5.0</rating>
+    <reviews>129</reviews>
+    <phone>+971 55 662 1503</phone>
+    <website>atomic.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="40">
+    <name>ALH Properties</name>
+    <rating>4.7</rating>
+    <reviews>221</reviews>
+    <phone>+971 4 570 1303</phone>
+    <website>alhprops.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="41">
+    <name>Coral Shore Real Estate Brokers - Dubai Branch</name>
+    <rating>4.0</rating>
+    <reviews>24</reviews>
+    <phone>+971 4 388 5866</phone>
+    <website>coralshoredubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="42">
+    <name>Visionary Real Estate</name>
+    <rating>4.5</rating>
+    <reviews>81</reviews>
+    <phone>+971 50 524 6714</phone>
+    <website>vision-ary.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="43">
+    <name>Loam Real Estate - Best Real Estate Agency in Dubai</name>
+    <rating>4.4</rating>
+    <reviews>60</reviews>
+    <phone>+971 4 576 2722</phone>
+    <website>loamrealestate.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="44">
+    <name>Magus Real Estate Brokers LLC</name>
+    <rating>4.9</rating>
+    <reviews>50</reviews>
+    <phone>+971 4 303 9700</phone>
+    <website>magusproperties.ae</website>
+    <emails>info@magusproperties.ae</emails>
+  </lead>
+  <lead id="45">
+    <name>Silver Oak Properties | Real Estate Company in Dubai</name>
+    <rating>4.8</rating>
+    <reviews>92</reviews>
+    <phone>+971 800 555555</phone>
+    <website>silveroakglobal.com</website>
+    <emails>info@silveroakglobal.com</emails>
+  </lead>
+  <lead id="46">
+    <name>Trillium Real Estate Dubai</name>
+    <rating>4.9</rating>
+    <reviews>42</reviews>
+    <phone>+971 56 444 4105</phone>
+    <website>trillium.ae</website>
+    <emails>info@trillium.ae</emails>
+  </lead>
+  <lead id="47">
+    <name>Tesla Properties - Real Estate Company in Dubai</name>
+    <rating>4.7</rating>
+    <reviews>76</reviews>
+    <phone>+971 4 585 3725</phone>
+    <website>teslaproperties.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="48">
+    <name>Seven Luxury Real Estate</name>
+    <rating>4.6</rating>
+    <reviews>22</reviews>
+    <phone>+971 4 421 7770</phone>
+    <website>sevenluxuryrealestate.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="49">
+    <name>Dubai Real Estate Corporation HQ</name>
+    <rating>4.6</rating>
+    <reviews>28</reviews>
+    <phone>+971 4 398 6666</phone>
+    <website>wasl.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="50">
+    <name>Properties Exchange Real Estate</name>
+    <rating>4.8</rating>
+    <reviews>99</reviews>
+    <phone>+971 4 330 3114</phone>
+    <website>pedxb.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="51">
+    <name>Broeck Real Estate</name>
+    <rating>4.9</rating>
+    <reviews>40</reviews>
+    <phone>+971 4 564 3109</phone>
+    <website>broeckrealestate.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="52">
+    <name>Alba Homes - Real Estate Agency Dubai</name>
+    <rating>4.5</rating>
+    <reviews>44</reviews>
+    <phone>+971 58 810 7254</phone>
+    <website>alba.homes</website>
+    <emails>info@alba.homes</emails>
+  </lead>
+  <lead id="53">
+    <name>TopLevel Real Estate Brokerage</name>
+    <rating>4.6</rating>
+    <reviews>22</reviews>
+    <phone>+971 58 583 5333</phone>
+    <website>top-level.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="54">
+    <name>Homes 4 Life Real Estate</name>
+    <rating>4.2</rating>
+    <reviews>391</reviews>
+    <phone>+971 4 338 7300</phone>
+    <website>homes4life.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="55">
+    <name>TheRealtorDubai Real Estate Brokerage LLC</name>
+    <rating>5.0</rating>
+    <reviews>123</reviews>
+    <phone>+971 55 195 2518</phone>
+    <website>therealtordubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="56">
+    <name>Best Real Estate Company in Dubai</name>
+    <rating>4.6</rating>
+    <reviews>20</reviews>
+    <phone>+971 56 990 3621</phone>
+    <website>dubaieurorealestate.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="57">
+    <name>RED. Real Estate in Dubai</name>
+    <rating>4.9</rating>
+    <reviews>28</reviews>
+    <phone>+971 55 378 2443</phone>
+    <website>redrealtydubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="58">
+    <name>ARK Real Estate Dubai</name>
+    <rating>4.7</rating>
+    <reviews>42</reviews>
+    <phone>+971 58 627 8678</phone>
+    <website>arkrealestatedubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="59">
+    <name>Housess Real Estate - Dubai Hills</name>
+    <rating>4.7</rating>
+    <reviews>58</reviews>
+    <phone>+971 4 569 3020</phone>
+    <website>housess.ae</website>
+    <emails>info@housess.ae</emails>
+  </lead>
+  <lead id="60">
+    <name>Baron Luxe Real Estate LLC</name>
+    <rating>4.9</rating>
+    <reviews>175</reviews>
+    <phone>+971 4 558 3354</phone>
+    <website>blre.ae</website>
+    <emails>%20info@blre.ae, info@blre.ae</emails>
+  </lead>
+  <lead id="61">
+    <name>Kharz Real Estate LLC - Real Estate Agency In Dubai - Flat For Sale | Office For Sale</name>
+    <rating>5.0</rating>
+    <reviews>17</reviews>
+    <phone>+971 56 898 9229</phone>
+    <website>kharz.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="62">
+    <name>SEKENKOUM REAL ESTATE L.L.C</name>
+    <rating>4.7</rating>
+    <reviews>77</reviews>
+    <phone>+971 58 513 0111</phone>
+    <website>sekenkoum.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="63">
+    <name>Stone House Real Estate, Dubai</name>
+    <rating>4.2</rating>
+    <reviews>37</reviews>
+    <phone>+971 56 843 8666</phone>
+    <website>shre.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="64">
+    <name>𝐃𝐒𝐐 𝐑𝐞𝐚𝐥 𝐄𝐬𝐭𝐚𝐭𝐞 - Real Estate Investment Consultant Dubai, Off Plan Properties in UAE</name>
+    <rating>5.0</rating>
+    <reviews>26</reviews>
+    <phone>+971 4 224 8763</phone>
+    <website>dsqrealestate.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="65">
+    <name>Algebra Real Estate Broker LLC</name>
+    <rating>4.9</rating>
+    <reviews>12</reviews>
+    <phone>+971 4 425 0019</phone>
+    <website>algebra-property.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="66">
+    <name>Riseonic Realty Real Estate, Dubai</name>
+    <rating>4.7</rating>
+    <reviews>12</reviews>
+    <phone>+971 4 874 7473</phone>
+    <website>riseonic.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="67">
+    <name>Aurantius Real Estate</name>
+    <rating>4.5</rating>
+    <reviews>66</reviews>
+    <phone>+971 4 392 9715</phone>
+    <website>aurantius.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="68">
+    <name>Lone Wolf Real Estate, Dubai, U.A.E.</name>
+    <rating>4.9</rating>
+    <reviews>41</reviews>
+    <phone>+971 4 394 4534</phone>
+    <website>lonewolfdubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="69">
+    <name>Equity DXB Real Estate</name>
+    <rating>4.7</rating>
+    <reviews>124</reviews>
+    <phone>+971 4 553 5095</phone>
+    <website>equitydxb.com</website>
+    <emails>info@equitydxb.com</emails>
+  </lead>
+  <lead id="70">
+    <name>Best Town Realty</name>
+    <rating>5.0</rating>
+    <reviews>88</reviews>
+    <phone>+971 58 552 3700</phone>
+    <website>bestownrealty.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="71">
+    <name>AKT Real Estate DUBAI</name>
+    <rating>4.4</rating>
+    <reviews>37</reviews>
+    <phone>+971 50 518 4986</phone>
+    <website>aktrealestate.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="72">
+    <name>Keller Williams Dubai</name>
+    <rating>4.1</rating>
+    <reviews>26</reviews>
+    <phone>+971 600 525259</phone>
+    <website>kwdubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="73">
+    <name>Realtree Properties - Leading Real Estate Agency in Dubai, UAE</name>
+    <rating>4.6</rating>
+    <reviews>95</reviews>
+    <phone>+971 52 422 2906</phone>
+    <website>realtree.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="74">
+    <name>Miva Real Estate</name>
+    <rating>5.0</rating>
+    <reviews>36</reviews>
+    <phone>+971 55 786 0987</phone>
+    <website>miva.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="75">
+    <name>Grand Vision Real Estate LLC | Dubai Property Consultants | Dubai Real Estate Agency | خرید ملک در دبی</name>
+    <rating>4.6</rating>
+    <reviews>43</reviews>
+    <phone>+971 50 133 5111</phone>
+    <website>grandvisionuae.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="76">
+    <name>Habico Properties Dubai</name>
+    <rating>4.6</rating>
+    <reviews>79</reviews>
+    <phone>+971 4 321 5368</phone>
+    <website>habicoproperties.com</website>
+    <emails>admin@habicoproperties.com</emails>
+  </lead>
+  <lead id="77">
+    <name>Lucietti Real Estate | Dubai Real Estate</name>
+    <rating>5.0</rating>
+    <reviews>14</reviews>
+    <phone>+971 54 514 4884</phone>
+    <website>luciettirealestate.com</website>
+    <emails>riccardo@luciettirealestate.com</emails>
+  </lead>
+  <lead id="78">
+    <name>Viking Real Estate Dubai</name>
+    <rating>5.0</rating>
+    <reviews>17</reviews>
+    <phone>+971 4 325 1007</phone>
+    <website>viking-realestate.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="79">
+    <name>Danube Properties - Dubai</name>
+    <rating>4.6</rating>
+    <reviews>2711</reviews>
+    <phone>+971 800 5757</phone>
+    <website>danubeproperties.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="80">
+    <name>Atlantis Real Estate</name>
+    <rating>4.9</rating>
+    <reviews>30</reviews>
+    <phone>+971 55 737 7447</phone>
+    <website>atlantisrealestate.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="81">
+    <name>In Dubai Real Estate - Real Estate Agency In Dubai</name>
+    <rating>5.0</rating>
+    <reviews>2</reviews>
+    <phone>+971 52 245 9998</phone>
+    <website>N/A</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="82">
+    <name>La Capitale Real Estate</name>
+    <rating>3.9</rating>
+    <reviews>83</reviews>
+    <phone>+971 50 888 5327</phone>
+    <website>lacapitaledubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="83">
+    <name>Vihaan Real Estate Brokerage</name>
+    <rating>5.0</rating>
+    <reviews>36</reviews>
+    <phone>+971 56 727 6363</phone>
+    <website>vrebuae.com</website>
+    <emails>devananda@vrebaue.com, devananda@vrebuae.com, devareddy16@gmail.com</emails>
+  </lead>
+  <lead id="84">
+    <name>Vierra Property Broker - Property Management &amp; Supervision Company</name>
+    <rating>4.7</rating>
+    <reviews>202</reviews>
+    <phone>+971 800 876</phone>
+    <website>vpd.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="85">
+    <name>fam Properties - Dubai Marina Branch</name>
+    <rating>4.6</rating>
+    <reviews>124</reviews>
+    <phone>+971 4 369 1700</phone>
+    <website>N/A</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="86">
+    <name>ECORP Real Estate</name>
+    <rating>4.7</rating>
+    <reviews>33</reviews>
+    <phone>+971 55 837 6670</phone>
+    <website>ecorprealestate.com</website>
+    <emails>admin@ecorprealestate.com</emails>
+  </lead>
+  <lead id="87">
+    <name>Key To Success Real Estate Dubai</name>
+    <rating>4.7</rating>
+    <reviews>45</reviews>
+    <phone>+971 50 235 2092</phone>
+    <website>N/A</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="88">
+    <name>betterhomes - Dubai (Head Office)</name>
+    <rating>4.2</rating>
+    <reviews>952</reviews>
+    <phone>+971 600 522233</phone>
+    <website>bhomes.com</website>
+    <emails>info@bhomes.com, customercare@bhomes.com</emails>
+  </lead>
+  <lead id="89">
+    <name>Potential Real Estate Dubai</name>
+    <rating>3.8</rating>
+    <reviews>171</reviews>
+    <phone>+971 4 298 1001</phone>
+    <website>potential-re.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="90">
+    <name>PearlStone Real Estate - Dubai</name>
+    <rating>4.9</rating>
+    <reviews>32</reviews>
+    <phone>+971 55 897 9808</phone>
+    <website>pearlstoneuae.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="91">
+    <name>Primedale Real Estate | Dubai Estate agent</name>
+    <rating>5.0</rating>
+    <reviews>53</reviews>
+    <phone>+971 4 529 3974</phone>
+    <website>primedale.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="92">
+    <name>Zephyr Homes Real Estate Dubai</name>
+    <rating>5.0</rating>
+    <reviews>11</reviews>
+    <phone>+971 50 228 8380</phone>
+    <website>zephyrhomesdxb.com</website>
+    <emails>impallari@gmail.com, luciano@latinotype.com, filler@godaddy.com, admin@zephyrhomesdxb.com, sales@zephyrhomesdxb.com</emails>
+  </lead>
+  <lead id="93">
+    <name>Synergy Properties Dubai</name>
+    <rating>4.3</rating>
+    <reviews>116</reviews>
+    <phone>+971 4 452 9877</phone>
+    <website>synergy.properties</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="94">
+    <name>Luxury Escapes Real Estate - Dubai Properties</name>
+    <rating>4.4</rating>
+    <reviews>29</reviews>
+    <phone>+971 4 345 5867</phone>
+    <website>luxury-escapes.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="95">
+    <name>DOMANSKY Real Estate - Dubai Luxury Apartments, Penthouses, Villas for Sale</name>
+    <rating>5.0</rating>
+    <reviews>11</reviews>
+    <phone>+971 4 243 8653 ext. 113</phone>
+    <website>domansky.ae</website>
+    <emails>info@domansky.ae</emails>
+  </lead>
+  <lead id="96">
+    <name>HJ Real Estates | Real Estate Agents in Business Bay - Dubai</name>
+    <rating>4.3</rating>
+    <reviews>114</reviews>
+    <phone>+971 4 326 2191</phone>
+    <website>hjrealestates.com</website>
+    <emails>info@hjrealestates.com</emails>
+  </lead>
+  <lead id="97">
+    <name>TEKCE Real Estate | Dubai Office</name>
+    <rating>5.0</rating>
+    <reviews>38</reviews>
+    <phone>+971 52 421 6588</phone>
+    <website>tekce.com</website>
+    <emails>info@tekce.com</emails>
+  </lead>
+  <lead id="98">
+    <name>Ocean Front Real Estate LLC, Dubai</name>
+    <rating>4.3</rating>
+    <reviews>24</reviews>
+    <phone>+971 4 242 4088</phone>
+    <website>oceanfrontdubai.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="99">
+    <name>Dubai Real Estate Centre</name>
+    <rating>4.2</rating>
+    <reviews>153</reviews>
+    <phone>+971 4 345 1111</phone>
+    <website>drec.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="100">
+    <name>Platinum Square Real Estate</name>
+    <rating>5.0</rating>
+    <reviews>35</reviews>
+    <phone>+971 58 535 9315</phone>
+    <website>platinumsquare.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="101">
+    <name>DUBAI REAL ESTATE COUPLE</name>
+    <rating>5.0</rating>
+    <reviews>2</reviews>
+    <phone>+971 50 508 4093</phone>
+    <website>N/A</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="102">
+    <name>ASWAR REALESTATE DUBAI</name>
+    <rating>4.0</rating>
+    <reviews>31</reviews>
+    <phone>+971 4 268 8815</phone>
+    <website>N/A</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="103">
+    <name>White Sand Real Estate Management LLC</name>
+    <rating>3.6</rating>
+    <reviews>315</reviews>
+    <phone>+971 4 232 8210</phone>
+    <website>whitesand.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="104">
+    <name>Daniels Real Estate | Dubai</name>
+    <rating>5.0</rating>
+    <reviews>24</reviews>
+    <phone>+971 4 572 7712</phone>
+    <website>danielsdubai.com</website>
+    <emails>info@danielsdubai.com</emails>
+  </lead>
+  <lead id="105">
+    <name>Zameendar Real Estate Dubai</name>
+    <rating>5.0</rating>
+    <reviews>36</reviews>
+    <phone>+971 50 404 0832</phone>
+    <website>zameendar.ae</website>
+    <emails>admin@zameendar.ae</emails>
+  </lead>
+  <lead id="106">
+    <name>Sapphire Sands - Real Estate Company in Dubai - Commercial Real Estate in Dubai - Property Developers in Dubai</name>
+    <rating>5.0</rating>
+    <reviews>16</reviews>
+    <phone>+971 50 368 3834</phone>
+    <website>sapphiresands.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="107">
+    <name>Bab Alwaha Real Estate - Real Estate Agent Dubai</name>
+    <rating>4.1</rating>
+    <reviews>77</reviews>
+    <phone>+971 52 888 3144</phone>
+    <website>babalwaha.estate</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="108">
+    <name>Falcon Premier Real Estate</name>
+    <rating>5.0</rating>
+    <reviews>36</reviews>
+    <phone>+971 54 279 1796</phone>
+    <website>falconpremier.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="109">
+    <name>Buy Sell Let Real Estate | Off-plan properties in dubai | Houses in dubai for sale | Freehold properties in Dubai</name>
+    <rating>5.0</rating>
+    <reviews>37</reviews>
+    <phone>+971 55 241 8753</phone>
+    <website>buyselllet.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="110">
+    <name>PJ International Real Estate | Top Real Estate Agency in Dubai</name>
+    <rating>5.0</rating>
+    <reviews>8</reviews>
+    <phone>+971 50 896 5707</phone>
+    <website>pj-international.com</website>
+    <emails>connect@pj-international.com</emails>
+  </lead>
+</leads>

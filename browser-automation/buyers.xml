@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<leads>
+  <lead id="1">
+    <name>Legend1st Digital Marketing Agency in Dubai - Social Media Marketing &amp; SEO Services</name>
+    <rating>5.0</rating>
+    <reviews>0</reviews>
+    <phone>+971 55 701 5031</phone>
+    <website>legend1st.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="2">
+    <name>Prism Digital</name>
+    <rating>4.6</rating>
+    <reviews>165</reviews>
+    <phone>+971 4 332 0808</phone>
+    <website>prism-me.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="3">
+    <name>Volga Tigris Marketing Agency</name>
+    <rating>4.8</rating>
+    <reviews>322</reviews>
+    <phone>+971 4 358 7311</phone>
+    <website>volgatigris.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="4">
+    <name>United SEO</name>
+    <rating>4.8</rating>
+    <reviews>0</reviews>
+    <phone>+971 4 442 6518</phone>
+    <website>unitedseo.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="5">
+    <name>Socio.ae | Digital Marketing Agency</name>
+    <rating>4.9</rating>
+    <reviews>19</reviews>
+    <phone>+971 54 525 5889</phone>
+    <website>socio.ae</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="6">
+    <name>Leads Dubai</name>
+    <rating>4.0</rating>
+    <reviews>0</reviews>
+    <phone>+971 50 304 7470</phone>
+    <website>leadsdubai.com</website>
+    <emails>leads@leadsdubai.com</emails>
+  </lead>
+  <lead id="7">
+    <name>Above Digital</name>
+    <rating>4.7</rating>
+    <reviews>43</reviews>
+    <phone>+971 4 321 2824</phone>
+    <website>abovedigital.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="8">
+    <name>Digital Links Digital Marketing Agency</name>
+    <rating>4.9</rating>
+    <reviews>0</reviews>
+    <phone>+971 52 472 3407</phone>
+    <website>digitallinkspro.com</website>
+    <emails>N/A</emails>
+  </lead>
+  <lead id="9">
+    <name>EDS FZCO</name>
+    <rating>4.5</rating>
+    <reviews>238</reviews>
+    <phone>+971 4 519 3444</phone>
+    <website>eds.ae</website>
+    <emails>manish@eds.ae, info@eds.ae, INFO@EDS.AE</emails>
+  </lead>
+  <lead id="10">
+    <name>Digital Arabia®</name>
+    <rating>4.9</rating>
+    <reviews>48</reviews>
+    <phone>+971 58 581 9677</phone>
+    <website>digitalarabia.ae</website>
+    <emails>N/A</emails>
+  </lead>
+</leads>

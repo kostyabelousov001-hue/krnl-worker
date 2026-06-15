@@ -1,0 +1,54 @@
+name: Build KRNL iOS Worker
+
+on:
+  push:
+    paths:
+      - 'ios-worker/**'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build IPA
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        working-directory: ios-worker
+        run: xcodegen generate
+
+      - name: Build .app (no sign)
+        working-directory: ios-worker
+        run: |
+          xcodebuild build \
+            -project KRNLWorker.xcodeproj \
+            -scheme KRNLWorker \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CONFIGURATION_BUILD_DIR=build
+
+      - name: Package unsigned .ipa
+        working-directory: ios-worker
+        run: |
+          mkdir -p Payload
+          cp -R build/KRNLWorker.app Payload/
+          zip -r KRNLWorker.ipa Payload/
+          rm -rf Payload build
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: KRNLWorker-unsigned
+          path: ios-worker/KRNLWorker.ipa

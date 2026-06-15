@@ -1,0 +1,15 @@
+{
+  "name": "browser-automation",
+  "version": "1.0.0",
+  "description": "Playwright automated scraping and task tools",
+  "main": "distributed-app.js",
+  "scripts": {
+    "start": "node distributed-app.js"
+  },
+  "dependencies": {
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.4.5",
+    "playwright": "^1.45.0",
+    "ws": "^8.16.0"
+  }
+}
