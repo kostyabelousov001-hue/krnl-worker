@@ -16,5 +16,4 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: space.krnlcamel.worker
       INFOPLIST_FILE: KRNLWorker/Info.plist
-      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       TARGETED_DEVICE_FAMILY: "1"
