@@ -29,6 +29,7 @@ jobs:
       - name: Build .app for iOS (no sign)
         working-directory: ios-worker
         run: |
+          set -o pipefail
           xcodebuild -project KRNLWorker.xcodeproj \
             -scheme KRNLWorker \
             -sdk iphoneos \
@@ -37,7 +38,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             CONFIGURATION_BUILD_DIR=build \
-            build | xcpretty && exit ${PIPESTATUS[0]}
+            build 2>&1
 
       - name: Package unsigned .ipa
         working-directory: ios-worker
