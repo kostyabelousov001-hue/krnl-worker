@@ -75,11 +75,12 @@ class ScraperEngine: NSObject {
         let group = DispatchGroup()
 
         for lead in leads {
-            guard let website = lead.website, website != "N/A" else {
+            let website = lead.website ?? "N/A"
+            guard website != "N/A" else {
                 results.append(ScrapedWebsite(
                     name: lead.name, rating: lead.rating ?? "N/A",
                     reviews: lead.reviews ?? "0", phone: lead.phone ?? "N/A",
-                    website: website, url: lead.url ?? "",
+                    website: "N/A", url: lead.url ?? "",
                     emails: "N/A", facebook: "N/A", instagram: "N/A", linkedin: "N/A"
                 ))
                 continue
