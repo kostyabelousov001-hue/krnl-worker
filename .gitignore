@@ -11,3 +11,7 @@ ios-worker/*.xcworkspace/
 ios-worker/*.xcodeproj/
 actions-logs/
 logs.zip
+
+actions-logs*/
+logs*.zip
+logs4.zip
