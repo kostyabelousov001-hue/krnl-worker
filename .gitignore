@@ -9,3 +9,5 @@ browser-automation/test_err.txt
 ios-worker/build/
 ios-worker/*.xcworkspace/
 ios-worker/*.xcodeproj/
+actions-logs/
+logs.zip
