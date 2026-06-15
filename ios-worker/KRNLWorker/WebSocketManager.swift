@@ -5,7 +5,6 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     @Published var isConnected = false
     @Published var isConnecting = false
     @Published var hostURL = "lol.krnlcamel.space"
-    @Published var port = "9090"
     @Published var connectedWorkers = 0
     @Published var tasksCompleted = 0
     @Published var leadsProcessed = 0
@@ -24,9 +23,6 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         if let saved = UserDefaults.standard.string(forKey: "host_url") {
             hostURL = saved
         }
-        if let saved = UserDefaults.standard.string(forKey: "host_port") {
-            port = saved
-        }
     }
 
     func fetchConfigAndConnect() {
@@ -35,9 +31,8 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         workerStatus = "Fetching config..."
 
         UserDefaults.standard.set(hostURL, forKey: "host_url")
-        UserDefaults.standard.set(port, forKey: "host_port")
 
-        let baseURL = "http://\(hostURL):\(port)"
+        let baseURL = "https://\(hostURL)"
         let group = DispatchGroup()
 
         group.enter()
@@ -59,7 +54,7 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     }
 
     private func connectWebSocket() {
-        let urlStr = "ws://\(hostURL):\(port)"
+        let urlStr = "wss://\(hostURL)"
         guard let url = URL(string: urlStr) else {
             isConnecting = false
             workerStatus = "Invalid URL"

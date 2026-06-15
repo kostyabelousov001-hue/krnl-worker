@@ -861,7 +861,7 @@ function renderTUI() {
 
     let roleText = '';
     if (state.role === 'HOST') {
-        roleText = `Role: ${bold}${green}HOST${reset} (cloudflared: http://lol.krnlcamel.space:${state.port}) | Workers: ${bold}${yellow}${state.connectedWorkers.length}${reset}`;
+        roleText = `Role: ${bold}${green}HOST${reset} (cloudflared → lol.krnlcamel.space) | Workers: ${bold}${yellow}${state.connectedWorkers.length}${reset}`;
     } else if (state.role === 'WORKER') {
         roleText = `Role: ${bold}${magenta}WORKER${reset} → ${state.hostUrl}`;
     } else {
