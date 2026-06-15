@@ -1,0 +1,32 @@
+{
+  "ingress": [
+    {
+      "hostname": "rooms.krnlcamel.space",
+      "originRequest": { "noTLSVerify": true },
+      "service": "http://127.0.0.1:9191"
+    },
+    {
+      "hostname": "api.krnlcamel.space",
+      "service": "http://127.0.0.1:3001"
+    },
+    {
+      "hostname": "krnlcamel.space",
+      "service": "http://localhost:9090"
+    },
+    {
+      "hostname": "lol.krnlcamel.space",
+      "service": "http://localhost:9090"
+    },
+    {
+      "hostname": "ai.krnlcamel.space",
+      "service": "http://localhost:3002"
+    },
+    {
+      "hostname": "ui.krnlcamel.space",
+      "service": "http://localhost:8080"
+    },
+    {
+      "service": "http_status:404"
+    }
+  ]
+}

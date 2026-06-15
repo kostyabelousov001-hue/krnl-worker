@@ -7,7 +7,7 @@
  xmlns:html="http://www.w3.org/TR/REC-html40">
  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
   <Author>KRNL Scraper</Author>
-  <Created>2026-06-15T09:02:32.029Z</Created>
+  <Created>2026-06-15T15:50:30.787Z</Created>
  </DocumentProperties>
  <Styles>
   <Style ss:ID="Default" ss:Name="Normal">
@@ -45,7 +45,7 @@
     <Cell><Data ss:Type="Number">14</Data></Cell>
     <Cell><Data ss:Type="String">+971 4 585 9074</Data></Cell>
     <Cell><Data ss:Type="String">christiesrealestatedubai.com</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@christiesrealestatedubai.com, name@example.com</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Metropolitan Premium Properties</Data></Cell>
@@ -133,7 +133,7 @@
     <Cell><Data ss:Type="Number">0</Data></Cell>
     <Cell><Data ss:Type="String">+971 4 245 4800</Data></Cell>
     <Cell><Data ss:Type="String">drivenproperties.com</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">you@example.com, john.doe@example.com, info@drivenproperties.com, u003einfo@drivenproperties.com, info.auh@drivenproperties.com, u003einfo.auh@drivenproperties.com, hello@drivenproperties.es, u003ehello@drivenproperties.es, info@drivenegypt.com, u003einfo@drivenegypt.com, info@drivenproperties.in, u003einfo@drivenproperties.in, info.jp@drivenproperties.com, u003einfo.jp@drivenproperties.com</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Arabian Estates - Real Estate Agency Dubai</Data></Cell>
@@ -189,7 +189,7 @@
     <Cell><Data ss:Type="Number">280</Data></Cell>
     <Cell><Data ss:Type="String">+971 4 279 9100</Data></Cell>
     <Cell><Data ss:Type="String">bso.ae</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">whiterabbit@follow.me</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Tribeca Real Estate LLC</Data></Cell>
@@ -261,7 +261,7 @@
     <Cell><Data ss:Type="Number">213</Data></Cell>
     <Cell><Data ss:Type="String">+971 55 661 0000</Data></Cell>
     <Cell><Data ss:Type="String">homeland.ae</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@homeland.ae</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Tree House Real Estate Dubai</Data></Cell>
@@ -285,7 +285,7 @@
     <Cell><Data ss:Type="Number">57</Data></Cell>
     <Cell><Data ss:Type="String">+971 55 269 7381</Data></Cell>
     <Cell><Data ss:Type="String">uniquezone.realestate</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@uniquezone.realestate, bm@uzreindia.com, info@uzdubai.com</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">99 Real Estate Brokers LLC</Data></Cell>
@@ -301,7 +301,7 @@
     <Cell><Data ss:Type="Number">21</Data></Cell>
     <Cell><Data ss:Type="String">+971 4 608 6560</Data></Cell>
     <Cell><Data ss:Type="String">thecapitaldubai.com</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@thecapitaldubai.com</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Seven Skys Real Estate Dubai</Data></Cell>
@@ -349,7 +349,7 @@
     <Cell><Data ss:Type="Number">129</Data></Cell>
     <Cell><Data ss:Type="String">+971 55 662 1503</Data></Cell>
     <Cell><Data ss:Type="String">atomic.ae</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">Alinawaz29@gmail.com, sadia@atomic.ae, taha@atomic.ae, azhar@atomic.ae, Msi_75pk@yahoo.com, Fatimadunn@live.com, Hakangokkaya_@hotmail.com, borovskoisergeidxb@gmail.com, aamirabbas.contact@gmail.com, Gnawaz1987@gmail.com, shaunvdlinden74@gmail.com, yangsunny1984@gmail.com, farhad@atomic.ae, tarig@atomic.ae, asbatomic.ae@gmail.com, regardson@lynsdubai.com, Courtenay@atomic.ae, sanas@atomic.ae, hr@atomic.ae, faisal@atomic.ae, tariqmcom@gmail.com, Asif.khan@atomic.ae, fawad@atomic.ae, angelund555@gmail.com, Umairevernest@gmail.com, realtordso@gmail.com, alex@atomic.ae, natasha@atomic.ae, malik@atomic.ae, bindia@atomic.ae, annie@atomic.ae, daniel@atomic.ae, lisa@atomic.ae, zahid@atomic.ae, hugo@atomic.ae, farhan@atomic.ae, wang@atomic.ae, Ismail@atomic.ae, atifmirza@atomic.ae, imran@atomic.ae, info@atomic.ae, receptionjlt@atomic.ae</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">ALH Properties</Data></Cell>
@@ -413,7 +413,7 @@
     <Cell><Data ss:Type="Number">76</Data></Cell>
     <Cell><Data ss:Type="String">+971 4 585 3725</Data></Cell>
     <Cell><Data ss:Type="String">teslaproperties.ae</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@teslaproperties.ae</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Seven Luxury Real Estate</Data></Cell>
@@ -421,7 +421,7 @@
     <Cell><Data ss:Type="Number">22</Data></Cell>
     <Cell><Data ss:Type="String">+971 4 421 7770</Data></Cell>
     <Cell><Data ss:Type="String">sevenluxuryrealestate.com</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@sevenluxuryrealestate.com</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Dubai Real Estate Corporation HQ</Data></Cell>
@@ -485,7 +485,7 @@
     <Cell><Data ss:Type="Number">20</Data></Cell>
     <Cell><Data ss:Type="String">+971 56 990 3621</Data></Cell>
     <Cell><Data ss:Type="String">dubaieurorealestate.com</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info.re@dubaieuro.com</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">RED. Real Estate in Dubai</Data></Cell>
@@ -533,7 +533,7 @@
     <Cell><Data ss:Type="Number">77</Data></Cell>
     <Cell><Data ss:Type="String">+971 58 513 0111</Data></Cell>
     <Cell><Data ss:Type="String">sekenkoum.com</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@sekenkoum.com</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Stone House Real Estate, Dubai</Data></Cell>
@@ -573,7 +573,7 @@
     <Cell><Data ss:Type="Number">66</Data></Cell>
     <Cell><Data ss:Type="String">+971 4 392 9715</Data></Cell>
     <Cell><Data ss:Type="String">aurantius.ae</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">fatemeh@aurantius.ae, iryn@aurantius.ae, touseef@aurantius.ae, naveed@aurantius.ae, website@aurantius.ae</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Lone Wolf Real Estate, Dubai, U.A.E.</Data></Cell>
@@ -885,7 +885,7 @@
     <Cell><Data ss:Type="Number">16</Data></Cell>
     <Cell><Data ss:Type="String">+971 50 368 3834</Data></Cell>
     <Cell><Data ss:Type="String">sapphiresands.ae</Data></Cell>
-    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">info@sapphiresands.ae</Data></Cell>
    </Row>
    <Row>
     <Cell><Data ss:Type="String">Bab Alwaha Real Estate - Real Estate Agent Dubai</Data></Cell>
@@ -918,6 +918,118 @@
     <Cell><Data ss:Type="String">+971 50 896 5707</Data></Cell>
     <Cell><Data ss:Type="String">pj-international.com</Data></Cell>
     <Cell><Data ss:Type="String">connect@pj-international.com</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Al Mirath Real Estates</Data></Cell>
+    <Cell><Data ss:Type="Number">4.7</Data></Cell>
+    <Cell><Data ss:Type="Number">174</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 546 9777</Data></Cell>
+    <Cell><Data ss:Type="String">almirath.ae</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Provident Real Estate</Data></Cell>
+    <Cell><Data ss:Type="Number">4.6</Data></Cell>
+    <Cell><Data ss:Type="Number">524</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 323 3609</Data></Cell>
+    <Cell><Data ss:Type="String">providentestate.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Lazudi Real Estate Dubai</Data></Cell>
+    <Cell><Data ss:Type="Number">3.8</Data></Cell>
+    <Cell><Data ss:Type="Number">9</Data></Cell>
+    <Cell><Data ss:Type="String">+971 56 418 9818</Data></Cell>
+    <Cell><Data ss:Type="String">lazudi.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Savills Dubai</Data></Cell>
+    <Cell><Data ss:Type="Number">3.6</Data></Cell>
+    <Cell><Data ss:Type="Number">242</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 365 7700</Data></Cell>
+    <Cell><Data ss:Type="String">dubai.savills.ae</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Dubai Real estate</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">+971 56 448 8788</Data></Cell>
+    <Cell><Data ss:Type="String">vakson.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">AuLux Oceanview Properties</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="String">auluxoceanview.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Exclusive Links Real Estate Brokers Dubai Marina</Data></Cell>
+    <Cell><Data ss:Type="Number">4.8</Data></Cell>
+    <Cell><Data ss:Type="Number">236</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 399 4937</Data></Cell>
+    <Cell><Data ss:Type="String">exclusive-links.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Springfield Properties</Data></Cell>
+    <Cell><Data ss:Type="Number">4.8</Data></Cell>
+    <Cell><Data ss:Type="Number">391</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 454 2588</Data></Cell>
+    <Cell><Data ss:Type="String">springfieldproperties.ae</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Green Desert Real Estate Dubai</Data></Cell>
+    <Cell><Data ss:Type="Number">4.7</Data></Cell>
+    <Cell><Data ss:Type="Number">85</Data></Cell>
+    <Cell><Data ss:Type="String">+971 50 324 2054</Data></Cell>
+    <Cell><Data ss:Type="String">greendesertrealestate.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Roots Land Real Estate</Data></Cell>
+    <Cell><Data ss:Type="Number">4.6</Data></Cell>
+    <Cell><Data ss:Type="Number">296</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 329 8333</Data></Cell>
+    <Cell><Data ss:Type="String">rootsland.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Impressive Real Estate LLC</Data></Cell>
+    <Cell><Data ss:Type="Number">4.9</Data></Cell>
+    <Cell><Data ss:Type="Number">93</Data></Cell>
+    <Cell><Data ss:Type="String">+971 50 746 5012</Data></Cell>
+    <Cell><Data ss:Type="String">impressiverealestate.net</Data></Cell>
+    <Cell><Data ss:Type="String">info@impressiverealestate.net</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">H&amp;S Real Estate</Data></Cell>
+    <Cell><Data ss:Type="Number">4.5</Data></Cell>
+    <Cell><Data ss:Type="Number">308</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 345 4888</Data></Cell>
+    <Cell><Data ss:Type="String">hsproperty.ae</Data></Cell>
+    <Cell><Data ss:Type="String">info@hsproperty.ae, example@example.com, john@example.com</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Aaronz &amp; Co. Real Estate Services</Data></Cell>
+    <Cell><Data ss:Type="Number">4.9</Data></Cell>
+    <Cell><Data ss:Type="Number">508</Data></Cell>
+    <Cell><Data ss:Type="String">+971 4 584 9243</Data></Cell>
+    <Cell><Data ss:Type="String">aaronz.co</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Ethan Estates International</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
+    <Cell><Data ss:Type="Number">860</Data></Cell>
+    <Cell><Data ss:Type="String">+1 860-823-0326</Data></Cell>
+    <Cell><Data ss:Type="String">ethanestates.com</Data></Cell>
+    <Cell><Data ss:Type="String">N/A</Data></Cell>
    </Row>
 
   </Table>

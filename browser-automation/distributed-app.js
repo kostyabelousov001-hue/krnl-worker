@@ -27,8 +27,8 @@ const state = {
     wsServer: null,
     wsClient: null,
     connectedWorkers: [], // For Host: { id, ws, status, ip, browser }
-    hostUrl: 'ws://localhost:9090',
-    port: 9090,
+    hostUrl: 'ws://localhost:8000',
+    port: 8000,
     phase: 'IDLE',
     discoveredCount: 0,
     extractedCount: 0,
@@ -1489,7 +1489,7 @@ process.stdin.on('keypress', (str, key) => {
         renderTUI();
     } else if (key.name === 'w') {
         state.inputMode = 'WS_URL';
-        state.inputValue = 'ws://localhost:9090';
+        state.inputValue = 'ws://lol.krnlcamel.space';
         renderTUI();
     } else if (key.name === 'q') {
         state.inputMode = 'QUERY';
