@@ -15,3 +15,13 @@ logs.zip
 actions-logs*/
 logs*.zip
 logs4.zip
+
+cf_*.txt
+cf-*.json
+port-proxy.js
+start-*.bat
+*.zip
+logs.zip
+logs3.zip
+logs4.zip
+logs5.zip
