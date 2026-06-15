@@ -26,18 +26,18 @@ jobs:
         working-directory: ios-worker
         run: xcodegen generate
 
-      - name: Build .app (no sign)
+      - name: Build .app for iOS (no sign)
         working-directory: ios-worker
         run: |
-          xcodebuild build \
-            -project KRNLWorker.xcodeproj \
+          xcodebuild -project KRNLWorker.xcodeproj \
             -scheme KRNLWorker \
             -sdk iphoneos \
             -configuration Release \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            CONFIGURATION_BUILD_DIR=build
+            CONFIGURATION_BUILD_DIR=build \
+            build | xcpretty && exit ${PIPESTATUS[0]}
 
       - name: Package unsigned .ipa
         working-directory: ios-worker
