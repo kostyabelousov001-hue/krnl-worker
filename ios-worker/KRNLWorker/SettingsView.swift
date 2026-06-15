@@ -78,7 +78,7 @@ struct SettingsView: View {
                 Button {
                     wsManager.hostURL = hostURL.isEmpty ? "lol.krnlcamel.space" : hostURL
                     wsManager.port = port.isEmpty ? "9090" : port
-                    wsManager.connect()
+                    wsManager.fetchConfigAndConnect()
                     dismiss()
                 } label: {
                     HStack(spacing: 8) {

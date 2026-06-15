@@ -1,4 +1,5 @@
 const { WebSocketServer, WebSocket } = require('ws');
+const http = require('http');
 const readline = require('readline');
 const fs = require('fs');
 const path = require('path');
@@ -27,6 +28,7 @@ const state = {
     wsClient: null,
     connectedWorkers: [], // For Host: { id, ws, status, ip, browser }
     hostUrl: 'ws://localhost:9090',
+    port: 9090,
     phase: 'IDLE',
     discoveredCount: 0,
     extractedCount: 0,
@@ -859,7 +861,7 @@ function renderTUI() {
 
     let roleText = '';
     if (state.role === 'HOST') {
-        roleText = `Role: ${bold}${green}HOST${reset} (ws://lol.krnlcamel.space:9090) | Workers: ${bold}${yellow}${state.connectedWorkers.length}${reset}`;
+        roleText = `Role: ${bold}${green}HOST${reset} (cloudflared: http://lol.krnlcamel.space:${state.port}) | Workers: ${bold}${yellow}${state.connectedWorkers.length}${reset}`;
     } else if (state.role === 'WORKER') {
         roleText = `Role: ${bold}${magenta}WORKER${reset} → ${state.hostUrl}`;
     } else {
@@ -973,15 +975,59 @@ function dispatchNextWebTask(worker) {
     renderTUI();
 }
 
-// --- HOST WS SERVER ---
+// --- HOST WS SERVER (HTTP + WS for cloudflared) ---
 function startHostServer() {
     state.role = 'HOST';
-    state.wsServer = new WebSocketServer({ port: 9090 });
-    log("WebSocket Server on port 9090 ✓");
+
+    const httpServer = http.createServer((req, res) => {
+        if (req.method === 'GET' && req.url === '/health') {
+            res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            res.end(JSON.stringify({ status: 'ok', workers: state.connectedWorkers.length, phase: state.phase, leads: state.leads.length }));
+            return;
+        }
+
+        if (req.method === 'GET' && req.url === '/script/worker.js') {
+            const scriptPath = path.join(__dirname, 'worker-script.js');
+            if (fs.existsSync(scriptPath)) {
+                const script = fs.readFileSync(scriptPath, 'utf8');
+                res.writeHead(200, { 'Content-Type': 'application/javascript', 'Access-Control-Allow-Origin': '*' });
+                res.end(script);
+            } else {
+                res.writeHead(404);
+                res.end('Script not found');
+            }
+            return;
+        }
+
+        if (req.method === 'GET' && req.url === '/config/design.json') {
+            const designPath = path.join(__dirname, 'design.json');
+            if (fs.existsSync(designPath)) {
+                const design = fs.readFileSync(designPath, 'utf8');
+                res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+                res.end(design);
+            } else {
+                res.writeHead(404);
+                res.end('Design config not found');
+            }
+            return;
+        }
+
+        res.writeHead(426, { 'Upgrade': 'websocket' });
+        res.end('This server accepts WebSocket connections');
+    });
+
+    const PORT = parseInt(process.env.PORT) || state.port || 9090;
+    state.port = PORT;
+    httpServer.listen(PORT, () => {
+        log(`HTTP+WS Server on http://0.0.0.0:${PORT} ✓`);
+    });
+
+    state.wsServer = new WebSocketServer({ server: httpServer });
+    log(`For cloudflared: cloudflared tunnel --url http://localhost:${PORT} --protocol auto krnl-node`);
 
     state.wsServer.on('connection', (ws, req) => {
         const ip = req.socket.remoteAddress;
-        const workerId = Date.now(); // unique id
+        const workerId = Date.now();
         const worker = { id: workerId, ws, status: 'Connected', ip };
         state.connectedWorkers.push(worker);
         log(`Worker #${workerId} joined from ${ip}`);

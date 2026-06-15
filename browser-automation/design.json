@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "name": "KRNL Dark",
+  "colors": {
+    "background": ["oklch(0.15 0.05 260)", "oklch(0.08 0.1 280)", "oklch(0.05 0.15 300)"],
+    "accent": ["oklch(0.7 0.3 260)", "oklch(0.6 0.2 300)"],
+    "success": "oklch(0.723 0.219 142.136)",
+    "error": "oklch(0.637 0.237 25.331)",
+    "warning": "oklch(0.795 0.184 86.047)",
+    "text": "#ffffff",
+    "textSecondary": "rgba(255,255,255,0.5)",
+    "textMuted": "rgba(255,255,255,0.2)",
+    "surface": "ultraThinMaterial"
+  },
+  "blobs": [
+    { "x": 0.8, "y": 0.2, "color": "oklch(0.6 0.25 260)", "blur": 40, "speed": 7 },
+    { "x": 0.2, "y": 0.8, "color": "oklch(0.6 0.2 300)", "blur": 40, "speed": 7 }
+  ],
+  "typography": {
+    "titleSize": 28,
+    "subtitleSize": 14,
+    "bodySize": 16,
+    "bold": true
+  },
+  "branding": {
+    "icon": "bolt.fill",
+    "title": "KRNL Worker",
+    "subtitle": "Distributed Scraper Node",
+    "version": "v1.0"
+  },
+  "animations": {
+    "springStiffness": 0.6,
+    "springDamping": 0.8,
+    "blobDuration": 7
+  }
+}

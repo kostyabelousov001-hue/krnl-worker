@@ -10,6 +10,8 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     @Published var tasksCompleted = 0
     @Published var leadsProcessed = 0
     @Published var workerStatus = "Idle"
+    @Published var designConfig: DesignConfig?
+    @Published var workerScript: String?
 
     private var webSocket: URLSessionWebSocketTask?
     private let session: URLSession
@@ -27,20 +29,40 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         }
     }
 
-    func connect() {
+    func fetchConfigAndConnect() {
         guard !isConnected, !isConnecting else { return }
         isConnecting = true
-        workerStatus = "Connecting..."
+        workerStatus = "Fetching config..."
 
         UserDefaults.standard.set(hostURL, forKey: "host_url")
         UserDefaults.standard.set(port, forKey: "host_port")
 
+        let baseURL = "http://\(hostURL):\(port)"
+        let group = DispatchGroup()
+
+        group.enter()
+        fetchDesign(from: "\(baseURL)/config/design.json") { [weak self] config in
+            DispatchQueue.main.async { self?.designConfig = config }
+            group.leave()
+        }
+
+        group.enter()
+        fetchScript(from: "\(baseURL)/script/worker.js") { [weak self] script in
+            DispatchQueue.main.async { self?.workerScript = script }
+            group.leave()
+        }
+
+        group.notify(queue: .main) { [weak self] in
+            self?.workerStatus = "Connecting..."
+            self?.connectWebSocket()
+        }
+    }
+
+    private func connectWebSocket() {
         let urlStr = "ws://\(hostURL):\(port)"
         guard let url = URL(string: urlStr) else {
-            DispatchQueue.main.async {
-                self.isConnecting = false
-                self.workerStatus = "Invalid URL"
-            }
+            isConnecting = false
+            workerStatus = "Invalid URL"
             return
         }
 
@@ -48,6 +70,29 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         webSocket?.delegate = self
         webSocket?.resume()
         receiveMessage()
+    }
+
+    private func fetchDesign(from urlString: String, completion: @escaping (DesignConfig?) -> Void) {
+        guard let url = URL(string: urlString) else { completion(nil); return }
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            guard let data = data, error == nil,
+                  let config = try? JSONDecoder().decode(DesignConfig.self, from: data) else {
+                completion(nil)
+                return
+            }
+            completion(config)
+        }.resume()
+    }
+
+    private func fetchScript(from urlString: String, completion: @escaping (String?) -> Void) {
+        guard let url = URL(string: urlString) else { completion(nil); return }
+        URLSession.shared.dataTask(with: url) { data, _, error in
+            guard let data = data, let script = String(data: data, encoding: .utf8), error == nil else {
+                completion(nil)
+                return
+            }
+            completion(script)
+        }.resume()
     }
 
     func disconnect() {
@@ -75,7 +120,7 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
             self.isConnected = true
             self.isConnecting = false
             self.workerStatus = "Ready"
-            self.scraperEngine = ScraperEngine(wsManager: self)
+            self.scraperEngine = ScraperEngine(wsManager: self, script: self.workerScript)
         }
         sendStatus("Ready")
     }
@@ -120,9 +165,7 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         guard let task = try? JSONDecoder().decode(WorkerTask.self, from: data) else {
             if let statusMsg = try? JSONDecoder().decode(StatusMessage.self, from: data) {
                 if statusMsg.type == "NO_MORE_TASKS" {
-                    DispatchQueue.main.async {
-                        self.workerStatus = "Waiting for tasks..."
-                    }
+                    DispatchQueue.main.async { self.workerStatus = "Waiting for tasks..." }
                 }
             }
             return
@@ -131,17 +174,13 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         switch task.type {
         case "TASK_DETAILS":
             if let items = task.items {
-                DispatchQueue.main.async {
-                    self.workerStatus = "Extracting \(items.count) places..."
-                }
+                DispatchQueue.main.async { self.workerStatus = "Extracting \(items.count) places..." }
                 scraperEngine?.extractDetails(items)
             }
 
         case "TASK_WEB":
             if let leads = task.leads {
-                DispatchQueue.main.async {
-                    self.workerStatus = "Crawling \(leads.count) websites..."
-                }
+                DispatchQueue.main.async { self.workerStatus = "Crawling \(leads.count) websites..." }
                 scraperEngine?.crawlWebsites(leads)
             }
 
@@ -175,4 +214,56 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
             self.workerStatus = "Idle"
         }
     }
+}
+
+// MARK: - Design Config Models
+
+struct DesignConfig: Codable {
+    let version: Int
+    let name: String
+    let colors: ColorsConfig
+    let blobs: [BlobConfig]?
+    let typography: TypographyConfig?
+    let branding: BrandingConfig?
+    let animations: AnimationsConfig?
+}
+
+struct ColorsConfig: Codable {
+    let background: [String]?
+    let accent: [String]?
+    let success: String?
+    let error: String?
+    let warning: String?
+    let text: String?
+    let textSecondary: String?
+    let textMuted: String?
+    let surface: String?
+}
+
+struct BlobConfig: Codable {
+    let x: Double
+    let y: Double
+    let color: String
+    let blur: Double
+    let speed: Double
+}
+
+struct TypographyConfig: Codable {
+    let titleSize: Double?
+    let subtitleSize: Double?
+    let bodySize: Double?
+    let bold: Bool?
+}
+
+struct BrandingConfig: Codable {
+    let icon: String?
+    let title: String?
+    let subtitle: String?
+    let version: String?
+}
+
+struct AnimationsConfig: Codable {
+    let springStiffness: Double?
+    let springDamping: Double?
+    let blobDuration: Double?
 }
