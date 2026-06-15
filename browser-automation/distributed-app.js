@@ -1012,6 +1012,19 @@ function startHostServer() {
             return;
         }
 
+        if (req.method === 'GET' && req.url === '/config/ui.json') {
+            const uiPath = path.join(__dirname, 'ui-config.json');
+            if (fs.existsSync(uiPath)) {
+                const ui = fs.readFileSync(uiPath, 'utf8');
+                res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+                res.end(ui);
+            } else {
+                res.writeHead(404);
+                res.end('UI config not found');
+            }
+            return;
+        }
+
         res.writeHead(426, { 'Upgrade': 'websocket' });
         res.end('This server accepts WebSocket connections');
     });

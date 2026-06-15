@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "app": {
+    "title": "KRNL Worker",
+    "icon": "bolt.fill",
+    "accentColor": "#007AFF",
+    "navigationStyle": "stack"
+  },
+  "sections": [
+    {
+      "id": "status",
+      "header": "Status",
+      "headerIcon": "antenna.radiowaves.left.and.right",
+      "type": "statusCard",
+      "fields": {
+        "connected": {
+          "icon": "checkmark.circle.fill",
+          "color": "#34C759"
+        },
+        "disconnected": {
+          "icon": "circle.slash",
+          "color": "#8E8E93"
+        }
+      }
+    },
+    {
+      "id": "dashboard",
+      "header": "Dashboard",
+      "headerIcon": "chart.bar.fill",
+      "type": "statsRow",
+      "items": [
+        { "key": "tasks", "icon": "list.clipboard", "label": "Tasks", "bind": "tasksCompleted" },
+        { "key": "leads", "icon": "person.3", "label": "Leads", "bind": "leadsProcessed" },
+        { "key": "status", "icon": "bolt", "label": "Status", "bind": "workerStatus" }
+      ]
+    },
+    {
+      "id": "connection",
+      "header": "Connection",
+      "headerIcon": "globe",
+      "type": "button",
+      "label": "Connect to Host",
+      "icon": "network",
+      "action": "openSettings"
+    },
+    {
+      "id": "info",
+      "header": "About",
+      "headerIcon": "info.circle.fill",
+      "type": "info",
+      "items": [
+        { "label": "Version", "value": "2.0 (hot-swap)" },
+        { "label": "Host", "bind": "hostURL" },
+        { "label": "Protocol", "value": "wss:// + https://" }
+      ]
+    }
+  ],
+  "colors": {
+    "background": "#000000",
+    "groupBackground": "#1C1C1E",
+    "text": "#FFFFFF",
+    "secondaryText": "#8E8E93",
+    "separator": "#38383A"
+  }
+}

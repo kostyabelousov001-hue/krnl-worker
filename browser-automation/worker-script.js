@@ -39,9 +39,9 @@
 
         return JSON.stringify({
             emails: emails.join(', ') || 'N/A',
-            facebook: fb,
-            instagram: ig,
-            linkedin: li
+            fb: fb,
+            ig: ig,
+            li: li
         });
     };
 

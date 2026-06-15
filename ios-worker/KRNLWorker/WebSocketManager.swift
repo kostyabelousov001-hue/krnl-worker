@@ -9,7 +9,7 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     @Published var tasksCompleted = 0
     @Published var leadsProcessed = 0
     @Published var workerStatus = "Idle"
-    @Published var designConfig: DesignConfig?
+    @Published var uiConfig: UIConfig?
     @Published var workerScript: String?
 
     private var webSocket: URLSessionWebSocketTask?
@@ -36,8 +36,8 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         let group = DispatchGroup()
 
         group.enter()
-        fetchDesign(from: "\(baseURL)/config/design.json") { [weak self] config in
-            DispatchQueue.main.async { self?.designConfig = config }
+        fetchJSON(from: "\(baseURL)/config/ui.json") { [weak self] (config: UIConfig?) in
+            DispatchQueue.main.async { self?.uiConfig = config }
             group.leave()
         }
 
@@ -67,15 +67,15 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         receiveMessage()
     }
 
-    private func fetchDesign(from urlString: String, completion: @escaping (DesignConfig?) -> Void) {
+    private func fetchJSON<T: Decodable>(from urlString: String, completion: @escaping (T?) -> Void) {
         guard let url = URL(string: urlString) else { completion(nil); return }
         URLSession.shared.dataTask(with: url) { data, _, error in
             guard let data = data, error == nil,
-                  let config = try? JSONDecoder().decode(DesignConfig.self, from: data) else {
+                  let decoded = try? JSONDecoder().decode(T.self, from: data) else {
                 completion(nil)
                 return
             }
-            completion(config)
+            completion(decoded)
         }.resume()
     }
 
@@ -209,56 +209,4 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
             self.workerStatus = "Idle"
         }
     }
-}
-
-// MARK: - Design Config Models
-
-struct DesignConfig: Codable {
-    let version: Int
-    let name: String
-    let colors: ColorsConfig
-    let blobs: [BlobConfig]?
-    let typography: TypographyConfig?
-    let branding: BrandingConfig?
-    let animations: AnimationsConfig?
-}
-
-struct ColorsConfig: Codable {
-    let background: [String]?
-    let accent: [String]?
-    let success: String?
-    let error: String?
-    let warning: String?
-    let text: String?
-    let textSecondary: String?
-    let textMuted: String?
-    let surface: String?
-}
-
-struct BlobConfig: Codable {
-    let x: Double
-    let y: Double
-    let color: String
-    let blur: Double
-    let speed: Double
-}
-
-struct TypographyConfig: Codable {
-    let titleSize: Double?
-    let subtitleSize: Double?
-    let bodySize: Double?
-    let bold: Bool?
-}
-
-struct BrandingConfig: Codable {
-    let icon: String?
-    let title: String?
-    let subtitle: String?
-    let version: String?
-}
-
-struct AnimationsConfig: Codable {
-    let springStiffness: Double?
-    let springDamping: Double?
-    let blobDuration: Double?
 }

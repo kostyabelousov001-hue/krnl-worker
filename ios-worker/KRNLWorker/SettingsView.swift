@@ -20,7 +20,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Host Address")
                 } footer: {
-                    Text("Enter the hostname or IP of your KRNL server. Cloudflare tunnel handles the connection.")
+                    Text("Uses wss:// and https:// through Cloudflare.")
                 }
 
                 Section {
@@ -32,10 +32,8 @@ struct SettingsView: View {
                     .frame(maxWidth: .infinity)
                     .font(.body.weight(.semibold))
 
-                    Button("Cancel", role: .cancel) {
-                        dismiss()
-                    }
-                    .frame(maxWidth: .infinity)
+                    Button("Cancel", role: .cancel) { dismiss() }
+                        .frame(maxWidth: .infinity)
                 }
             }
             .navigationTitle("Connection")

@@ -8,7 +8,6 @@ struct KRNLWorkerApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(wsManager)
-                .preferredColorScheme(.dark)
         }
     }
 }
