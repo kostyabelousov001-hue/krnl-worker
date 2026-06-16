@@ -1,91 +1,71 @@
-# ⚡ KRNL — Distributed Web Scraper
+# ⚡ Distributed Web Scraper
 
 [![Build iOS Worker](https://github.com/kostyabelousov001-hue/krnl-worker/actions/workflows/ios-build.yml/badge.svg)](https://github.com/kostyabelousov001-hue/krnl-worker/actions/workflows/ios-build.yml)
-[![Platform](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS-lightgrey)]()
-[![Platform](https://img.shields.io/badge/Mobile-iOS-blue)]()
-[![Language](https://img.shields.io/badge/language-Node.js%20%7C%20Swift-blue)]()
+[![Desktop](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS-lightgrey)]()
+[![Mobile](https://img.shields.io/badge/Mobile-iOS-blue)]()
 
-Distributed Google Maps scraper with hot-swappable iOS worker app. Scrapes B2B contacts (name, rating, phone, website, email) from Google Maps in parallel across multiple machines.
+Distributed Google Maps scraper with hot-swappable iOS worker app. Collects B2B contacts from Google Maps in parallel across multiple machines.
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
+cd browser-automation
 npm install
-PORT=8000 node browser-automation/distributed-app.js --auto --query "real estate Dubai" --passes 3
+PORT=9090 node distributed-app.js --auto --query "real estate Dubai" --passes 3
 ```
 
-iOS workers connect via `lol.krnlcamel.space`.
+Workers connect to the host via WebSocket.
 
 ---
 
-## 📦 Architecture
+## Architecture
 
 ```
-krn-worker/
-├── browser-automation/       # Core scraper (Node.js + Playwright)
-│   ├── distributed-app.js    # Multi-pass host + WebSocket server
-│   ├── worker-script.js      # Hot-swappable JS scraping logic
-│   ├── design.json           # Hot-swappable design config
-│   └── ui-config.json        # Hot-swappable iOS UI definition
-├── ios-worker/               # iOS app (SwiftUI)
-│   ├── KRNLWorker/           # Source files
-│   └── project.yml           # XcodeGen project spec
-└── .github/workflows/        # GitHub Actions CI/CD
-```
+server/               # Core scraper (Node.js + Playwright)
+├── distributed-app.js    # Multi-pass host + WebSocket server
+├── worker-script.js      # Hot-swappable JS scraping logic
+├── ui-config.json        # Hot-swappable iOS UI definition
+└── design.json           # Visual theme config
 
-### How it works
-
-```
-┌──────────┐   WebSocket    ┌──────────┐
-│  Host     │◄─────────────►│  Worker   │
-│ (Server)  │               │ (iPhone)  │
-└──────────┘               └──────────┘
-     │                            │
-     │ Serves:                    │ Downloads:
-     │  • /health (status)        │  • ui-config.json (UI layout)
-     │  • /script/worker.js       │  • worker-script.js (scraping logic)
-     │  • /config/ui.json         │
-     └────────────────────────────┘
+ios-worker/            # iOS app (SwiftUI)
+├── KRNLWorker/        # Source files
+└── project.yml        # XcodeGen project spec
 ```
 
 ---
 
-## 🔄 Hot-Swap
+## Hot-Swap
 
-Update the server files — iOS app picks them up automatically, no reinstall:
+Update server files — iOS app picks them up on next connect, no reinstall:
 
 | File | Changes without .ipa update |
 |---|---|
 | `worker-script.js` | Scraping logic (selectors, parsing) |
 | `ui-config.json` | Full iOS UI (sections, colors, icons) |
-| `design.json` | Visual theme |
+| `design.json` | Color theme |
 
 ---
 
-## 📱 iOS Worker
-
-Connect your iPhone as a distributed worker node:
+## iOS Worker
 
 1. Download `.ipa` from [GitHub Actions](https://github.com/kostyabelousov001-hue/krnl-worker/actions)
-2. Sideload with **AltStore** or **Sideloadly**
-3. Open → enter `lol.krnlcamel.space` → Connect
-
-The app renders UI from server `ui-config.json` and runs scraping logic from `worker-script.js`. Built once, updates forever.
+2. Install via AltStore or Sideloadly
+3. Open app → enter host address → Connect
 
 ---
 
-## ⚙️ Server Endpoints
+## Server Endpoints
 
 | Endpoint | Description |
 |---|---|
-| `GET /health` | Server status, worker count, phase |
+| `GET /health` | Server status |
 | `GET /script/worker.js` | Scraping JS for iOS hot-swap |
 | `GET /config/ui.json` | iOS UI definition |
 
 ---
 
-## 📄 License
+## License
 
 MIT

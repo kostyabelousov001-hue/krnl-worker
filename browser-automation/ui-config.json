@@ -1,7 +1,7 @@
 {
   "version": 2,
   "app": {
-    "title": "KRNL Worker",
+    "title": "Scraper Worker",
     "icon": "bolt.fill",
     "accentColor": "#007AFF",
     "navigationStyle": "stack"
@@ -49,7 +49,7 @@
       "headerIcon": "info.circle.fill",
       "type": "info",
       "items": [
-        { "label": "Version", "value": "2.0 (hot-swap)" },
+        { "label": "Version", "value": "1.0" },
         { "label": "Host", "bind": "hostURL" },
         { "label": "Protocol", "value": "wss:// + https://" }
       ]

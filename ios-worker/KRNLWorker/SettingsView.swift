@@ -12,7 +12,7 @@ struct SettingsView: View {
                     HStack {
                         Image(systemName: "network")
                             .foregroundStyle(.tint)
-                        TextField("lol.krnlcamel.space", text: $hostURL)
+                        TextField("host:9090", text: $hostURL)
                             .autocapitalization(.none)
                             .disableAutocorrection(true)
                             .font(.body)
@@ -25,7 +25,7 @@ struct SettingsView: View {
 
                 Section {
                     Button("Connect") {
-                        wsManager.hostURL = hostURL.isEmpty ? "lol.krnlcamel.space" : hostURL
+                        wsManager.hostURL = hostURL.isEmpty ? "host:9090" : hostURL
                         wsManager.fetchConfigAndConnect()
                         dismiss()
                     }

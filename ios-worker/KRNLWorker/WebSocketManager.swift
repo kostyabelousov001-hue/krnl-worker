@@ -4,7 +4,7 @@ import Network
 class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate {
     @Published var isConnected = false
     @Published var isConnecting = false
-    @Published var hostURL = "lol.krnlcamel.space"
+    @Published var hostURL = "host:9090"
     @Published var connectedWorkers = 0
     @Published var tasksCompleted = 0
     @Published var leadsProcessed = 0

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "name": "KRNL Dark",
+  "name": "Scraper Dark",
   "colors": {
     "background": ["oklch(0.15 0.05 260)", "oklch(0.08 0.1 280)", "oklch(0.05 0.15 300)"],
     "accent": ["oklch(0.7 0.3 260)", "oklch(0.6 0.2 300)"],
@@ -24,9 +24,9 @@
   },
   "branding": {
     "icon": "bolt.fill",
-    "title": "KRNL Worker",
-    "subtitle": "Distributed Scraper Node",
-    "version": "v1.0"
+    "title": "Scraper Worker",
+    "subtitle": "Distributed Node",
+    "version": "1.0"
   },
   "animations": {
     "springStiffness": 0.6,

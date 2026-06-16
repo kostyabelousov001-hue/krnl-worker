@@ -157,7 +157,7 @@ function generateHTMLReport(leads) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRNL Lightning Scraper - Leads Report</title>
+    <title>Scraper - Leads Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -412,7 +412,7 @@ function generateHTMLReport(leads) {
             <div class="logo-area">
                 <span>⚡ Live Dashboard</span>
             </div>
-            <h1>KRNL Scraper Leads</h1>
+            <h1>Scraper Leads</h1>
             <p>Экспортированные лиды с Google Maps и веб-сайтов. Все дубликаты отфильтрованы, контактные данные обогащены автоматически.</p>
         </header>
 
@@ -583,7 +583,7 @@ function generateExcelXMLReport(leads) {
  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:html="http://www.w3.org/TR/REC-html40">
  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
-  <Author>KRNL Scraper</Author>
+  <Author>Scraper</Author>
   <Created>${new Date().toISOString()}</Created>
  </DocumentProperties>
  <Styles>
@@ -854,14 +854,14 @@ function renderTUI() {
 
     const w = 98;
     console.log(`${cyan}┌${'─'.repeat(w - 2)}┐${reset}`);
-    const title = `⚡ KRNL LIGHTNING DISTRIBUTED CRAWLER v1.2 ⚡`;
+    const title = `⚡ DISTRIBUTED WEB SCRAPER ⚡`;
     const titlePadding = Math.floor((w - 2 - title.length) / 2);
     console.log(`${cyan}│${reset}${' '.repeat(titlePadding)}${bold}${yellow}${title}${reset}${' '.repeat(w - 2 - titlePadding - title.length)}${cyan}│${reset}`);
     console.log(`${cyan}└${'─'.repeat(w - 2)}┘${reset}`);
 
     let roleText = '';
     if (state.role === 'HOST') {
-        roleText = `Role: ${bold}${green}HOST${reset} (cloudflared → lol.krnlcamel.space) | Workers: ${bold}${yellow}${state.connectedWorkers.length}${reset}`;
+        roleText = `Role: ${bold}${green}HOST${reset} (ws://0.0.0.0:${state.port}) | Workers: ${bold}${yellow}${state.connectedWorkers.length}${reset}`;
     } else if (state.role === 'WORKER') {
         roleText = `Role: ${bold}${magenta}WORKER${reset} → ${state.hostUrl}`;
     } else {
@@ -1036,7 +1036,7 @@ function startHostServer() {
     });
 
     state.wsServer = new WebSocketServer({ server: httpServer });
-    log(`For cloudflared: cloudflared tunnel --url http://localhost:${PORT} --protocol auto krnl-node`);
+    log(`WebSocket server on ws://0.0.0.0:${PORT}`);
 
     state.wsServer.on('connection', (ws, req) => {
         const ip = req.socket.remoteAddress;
@@ -1502,7 +1502,7 @@ process.stdin.on('keypress', (str, key) => {
         renderTUI();
     } else if (key.name === 'w') {
         state.inputMode = 'WS_URL';
-        state.inputValue = 'ws://lol.krnlcamel.space';
+        state.inputValue = 'ws://host:9090';
         renderTUI();
     } else if (key.name === 'q') {
         state.inputMode = 'QUERY';

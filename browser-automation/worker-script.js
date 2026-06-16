@@ -1,7 +1,6 @@
-// KRNL Worker Script v1
-// Hot-swappable scraping logic — the iOS app downloads this
-// and runs it inside WKWebView. Update this file on the server
-// and all connected iOS workers get the new logic on next task.
+// Scraper Worker Script v1
+// Hot-swappable — update this file on the server,
+// all iOS workers get the new logic on next task.
 
 (function() {
     var KRNL = {};
