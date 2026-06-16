@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ KRNL Scraper Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --panel-bg: rgba(22, 24, 38, 0.65);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent: #6366f1;
+            --accent-grad: linear-gradient(135deg, #6366f1, #a855f7);
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            background: var(--accent-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            box-shadow: 0 0 8px var(--text-secondary);
+        }
+
+        .status-dot.connected {
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+
+        .status-dot.active {
+            background: var(--yellow);
+            box-shadow: 0 0 10px var(--yellow);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        /* PANEL */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        /* GRID LAYOUT */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        /* CONTROLS PANEL */
+        .controls-card {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-grad);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-danger {
+            background: var(--red);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        @media (min-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .stat-val {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* TERMINAL PANEL */
+        .terminal-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 350px;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-body {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            overflow-y: auto;
+            color: #10b981;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .log-line {
+            word-break: break-all;
+        }
+
+        .log-error { color: var(--red); }
+        .log-warn { color: var(--yellow); }
+        .log-info { color: #60a5fa; }
+
+        /* WORKERS PANEL */
+        .workers-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .workers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .worker-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .worker-id {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .worker-ip {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .worker-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-section">
+                <span class="logo-icon">⚡</span>
+                <h1>KRNL Scraper</h1>
+            </div>
+            <div class="status-badge">
+                <div class="status-dot" id="socket-dot"></div>
+                <span id="socket-text">Disconnected</span>
+            </div>
+        </header>
+
+        <!-- STATS GRID -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-val" id="stat-discovered">0</span>
+                <span class="stat-label">Discovered</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="stat-extracted">0</span>
+                <span class="stat-label">Extracted</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="stat-crawled">0</span>
+                <span class="stat-label">Crawled</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" id="stat-speed">0.0/m</span>
+                <span class="stat-label">Speed</span>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- LEFT PANEL: CONTROLS & WORKERS -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="panel controls-card">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Controls</h2>
+                    
+                    <div class="form-group">
+                        <label for="query-input">Search Query</label>
+                        <input type="text" id="query-input" value="real estate Dubai" placeholder="e.g. dentists Munich">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passes-input">Max Scroll Passes</label>
+                        <input type="number" id="passes-input" value="5" min="1" max="50">
+                    </div>
+
+                    <button class="btn btn-primary" id="start-btn">
+                        <span>▶ Start Scraping</span>
+                    </button>
+                    <button class="btn btn-danger" id="stop-btn" style="display: none;">
+                        <span>■ Stop Scraping</span>
+                    </button>
+                </div>
+
+                <div class="panel workers-panel">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">Active Workers</h2>
+                    <div class="workers-list" id="workers-list">
+                        <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 14px;">
+                            No workers connected
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: TERMINAL LOGS -->
+            <div class="panel terminal-panel">
+                <div class="terminal-header">
+                    <h2 style="font-size: 18px; font-weight: 600;">Activity Logs</h2>
+                    <button id="clear-logs" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 12px; font-weight: 600;">CLEAR</button>
+                </div>
+                <div class="terminal-body" id="logs-container">
+                    <div class="log-line log-info">[Console] UI Ready. Connecting to websocket...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        const socketDot = document.getElementById('socket-dot');
+        const socketText = document.getElementById('socket-text');
+        const logsContainer = document.getElementById('logs-container');
+        const workersList = document.getElementById('workers-list');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const queryInput = document.getElementById('query-input');
+        const passesInput = document.getElementById('passes-input');
+        const clearLogsBtn = document.getElementById('clear-logs');
+
+        // Stats elements
+        const statDiscovered = document.getElementById('stat-discovered');
+        const statExtracted = document.getElementById('stat-extracted');
+        const statCrawled = document.getElementById('stat-crawled');
+        const statSpeed = document.getElementById('stat-speed');
+
+        function appendLog(message) {
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            
+            if (message.toLowerCase().includes('error') || message.toLowerCase().includes('failed')) {
+                line.classList.add('log-error');
+            } else if (message.toLowerCase().includes('warning') || message.toLowerCase().includes('left')) {
+                line.classList.add('log-warn');
+            } else if (message.includes('✓') || message.includes('+') || message.toLowerCase().includes('complete')) {
+                line.classList.add('log-info');
+            }
+            
+            line.textContent = message;
+            logsContainer.appendChild(line);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function connect() {
+            const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${proto}//${window.location.host}/?type=ui`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                socketDot.className = 'status-dot connected';
+                socketText.textContent = 'Connected';
+                appendLog('[Console] Connected to WebSocket server.');
+            };
+
+            ws.onclose = () => {
+                socketDot.className = 'status-dot';
+                socketText.textContent = 'Disconnected';
+                appendLog('[Console] WebSocket connection lost. Reconnecting in 3s...');
+                setTimeout(connect, 3000);
+            };
+
+            ws.onerror = (err) => {
+                console.error(err);
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'STATE_UPDATE') {
+                        updateState(data.state);
+                    } else if (data.type === 'LOG') {
+                        appendLog(data.message);
+                    }
+                } catch (e) {
+                    console.error('Parse error:', e);
+                }
+            };
+        }
+
+        function updateState(state) {
+            // Update stats
+            statDiscovered.textContent = state.discoveredCount;
+            statExtracted.textContent = state.extractedCount;
+            statCrawled.textContent = state.crawledCount;
+            statSpeed.textContent = `${state.speedMin}/m`;
+
+            // Update UI elements based on phase
+            if (state.phase !== 'IDLE' && state.phase !== 'DONE') {
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'flex';
+                queryInput.disabled = true;
+                passesInput.disabled = true;
+                socketDot.className = 'status-dot active';
+                socketText.textContent = state.phase;
+            } else {
+                startBtn.style.display = 'flex';
+                stopBtn.style.display = 'none';
+                queryInput.disabled = false;
+                passesInput.disabled = false;
+                socketDot.className = 'status-dot connected';
+                socketText.textContent = 'Connected';
+            }
+
+            // Sync inputs if not focused
+            if (document.activeElement !== queryInput) {
+                queryInput.value = state.query;
+            }
+            if (document.activeElement !== passesInput) {
+                passesInput.value = state.maxPasses;
+            }
+
+            // Update workers list
+            workersList.innerHTML = '';
+            if (state.connectedWorkers.length === 0) {
+                workersList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 14px;">No workers connected</div>`;
+            } else {
+                state.connectedWorkers.forEach(w => {
+                    const el = document.createElement('div');
+                    el.className = 'worker-item';
+                    el.innerHTML = `
+                        <div>
+                            <div class="worker-id">Worker #${w.id}</div>
+                            <div class="worker-ip">${w.ip}</div>
+                        </div>
+                        <div class="worker-status">${w.status}</div>
+                    `;
+                    workersList.appendChild(el);
+                });
+            }
+        }
+
+        startBtn.onclick = () => {
+            const query = queryInput.value.trim();
+            const passes = parseInt(passesInput.value);
+            if (!query) return;
+
+            ws.send(JSON.stringify({
+                type: 'START_SCRAPE',
+                query: query,
+                maxPasses: passes
+            }));
+            appendLog(`[Console] Sent START_SCRAPE for "${query}"`);
+        };
+
+        stopBtn.onclick = () => {
+            ws.send(JSON.stringify({
+                type: 'STOP_SCRAPE'
+            }));
+            appendLog(`[Console] Sent STOP_SCRAPE`);
+        };
+
+        clearLogsBtn.onclick = () => {
+            logsContainer.innerHTML = '';
+            appendLog('[Console] Logs cleared');
+        };
+
+        connect();
+    </script>
+</body>
+</html>

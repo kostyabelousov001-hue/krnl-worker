@@ -35,6 +35,16 @@ struct SettingsView: View {
                     Button("Cancel", role: .cancel) { dismiss() }
                         .frame(maxWidth: .infinity)
                 }
+
+                if wsManager.isConnected {
+                    Section {
+                        Button("Disconnect", role: .destructive) {
+                            wsManager.disconnect()
+                            dismiss()
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
             }
             .navigationTitle("Connection")
             .navigationBarTitleDisplayMode(.inline)

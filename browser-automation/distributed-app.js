@@ -48,11 +48,41 @@ const state = {
 
 const BATCH_SIZE = 5; // 🔥 Reduced from 25 to 5 for better load balancing between host and remote/iOS workers
 
+const connectedUIs = [];
+
+function broadcastToUIs(data) {
+    const payload = JSON.stringify(data);
+    connectedUIs.forEach(ui => {
+        try { ui.ws.send(payload); } catch (e) {}
+    });
+}
+
+function sendStateToUIs() {
+    broadcastToUIs({
+        type: 'STATE_UPDATE',
+        state: {
+            phase: state.phase,
+            query: state.query,
+            maxPasses: state.maxPasses,
+            currentPass: state.currentPass,
+            discoveredCount: state.discoveredCount,
+            extractedCount: state.extractedCount,
+            crawledCount: state.crawledCount,
+            totalToProcess: state.totalToProcess,
+            speedSec: state.speedSec,
+            speedMin: state.speedMin,
+            leadsCount: state.leads.length,
+            connectedWorkers: state.connectedWorkers.map(w => ({ id: w.id, ip: w.ip, status: w.status }))
+        }
+    });
+}
+
 function log(msg) {
     const time = new Date().toLocaleTimeString();
     state.logs.push(`[${time}] ${msg}`);
-    if (state.logs.length > 15) state.logs.shift();
+    if (state.logs.length > 50) state.logs.shift();
     broadcastToWorkers({ type: 'LOG', message: `[${time}] ${msg}` });
+    broadcastToUIs({ type: 'LOG', message: `[${time}] ${msg}` });
 }
 
 function broadcastToWorkers(data) {
@@ -851,6 +881,9 @@ function finalizeOutputs() {
 function renderTUI() {
     process.stdout.write('\x1B[2J\x1B[3J\x1B[H');
     
+    // 🔥 Send real-time state updates to all connected UI clients
+    sendStateToUIs();
+    
     const bold = '\x1b[1m';
     const cyan = '\x1b[36m';
     const green = '\x1b[32m';
@@ -1039,6 +1072,20 @@ function startHostServer() {
             return;
         }
 
+        // 🔥 Serve the HTML Web Dashboard Console
+        if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html' || req.url === '/worker-ui')) {
+            const indexPath = path.join(__dirname, 'index.html');
+            if (fs.existsSync(indexPath)) {
+                const html = fs.readFileSync(indexPath, 'utf8');
+                res.writeHead(200, { 'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*' });
+                res.end(html);
+            } else {
+                res.writeHead(404);
+                res.end('UI file not found');
+            }
+            return;
+        }
+
         res.writeHead(426, { 'Upgrade': 'websocket' });
         res.end('This server accepts WebSocket connections');
     });
@@ -1054,6 +1101,47 @@ function startHostServer() {
 
     state.wsServer.on('connection', (ws, req) => {
         const ip = req.socket.remoteAddress;
+
+        // 🔥 Separate Worker and UI Dashboard connections via query parameters
+        let type = 'worker';
+        try {
+            const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+            type = urlObj.searchParams.get('type') || 'worker';
+        } catch (e) {}
+
+        if (type === 'ui') {
+            const uiClient = { ws };
+            connectedUIs.push(uiClient);
+            sendStateToUIs();
+
+            ws.on('message', (message) => {
+                try {
+                    const data = JSON.parse(message);
+                    if (data.type === 'START_SCRAPE') {
+                        state.query = data.query || state.query;
+                        state.maxPasses = data.maxPasses || state.maxPasses;
+                        if (state.phase === 'IDLE' || state.phase === 'DONE') {
+                            startScrapeJob();
+                        }
+                    } else if (data.type === 'STOP_SCRAPE') {
+                        log("Scrape job stopped from UI.");
+                        state.phase = 'IDLE';
+                        state.detailsQueue = [];
+                        state.webQueue = [];
+                        renderTUI();
+                    }
+                } catch (e) {
+                    log(`UI parse error: ${e.message}`);
+                }
+            });
+
+            ws.on('close', () => {
+                const idx = connectedUIs.indexOf(uiClient);
+                if (idx !== -1) connectedUIs.splice(idx, 1);
+            });
+            return;
+        }
+
         const workerId = Date.now();
         const worker = { id: workerId, ws, status: 'Connected', ip };
         state.connectedWorkers.push(worker);

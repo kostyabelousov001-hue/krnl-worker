@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 
 struct ContentView: View {
     @EnvironmentObject var wsManager: WebSocketManager
@@ -6,11 +7,18 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            if let ui = wsManager.uiConfig {
-                ServerDrivenList(ui: ui, showSettings: $showSettings)
-                    .navigationTitle(ui.app.title)
-                    .navigationBarTitleDisplayMode(.large)
-                    .toolbar { toolbarContent }
+            if wsManager.isConnected {
+                let rawHost = wsManager.hostURL
+                let finalHost = rawHost.hasPrefix("http") ? rawHost : "http://\(rawHost)"
+                if let url = URL(string: finalHost) {
+                    SwiftUIWebView(url: url)
+                        .edgesIgnoringSafeArea(.bottom)
+                        .navigationTitle("Scraper Console")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar { toolbarContent }
+                } else {
+                    Text("Invalid Host URL").foregroundStyle(.red)
+                }
             } else {
                 PlaceholderView()
                     .navigationTitle("Worker")
@@ -22,6 +30,11 @@ struct ContentView: View {
 
     @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button(action: { showSettings = true }) {
+                Image(systemName: "gearshape")
+            }
+        }
         ToolbarItem(placement: .navigationBarTrailing) {
             HStack(spacing: 6) {
                 Circle()
@@ -113,185 +126,25 @@ struct LogView: View {
     }
 }
 
-// MARK: - Server-Driven List
+// MARK: - SwiftUI Web View Wrapper
 
-struct ServerDrivenList: View {
-    let ui: UIConfig
-    @EnvironmentObject var wsManager: WebSocketManager
-    @Binding var showSettings: Bool
+struct SwiftUIWebView: UIViewRepresentable {
+    let url: URL
 
-    var body: some View {
-        List {
-            ForEach(ui.sections, id: \.id) { section in
-                Section {
-                    switch section.type {
-                    case "statusCard": StatusCardView(section: section)
-                    case "statsRow": StatsRowView(section: section)
-                    case "button": ButtonRowView(section: section, showSettings: $showSettings)
-                    case "info": InfoRowView(section: section)
-                    case "log": LogSectionView()
-                    default: Text("Unknown: \(section.type)")
-                    }
-                } header: {
-                    Label(section.header, systemImage: section.headerIcon)
-                }
-            }
-        }
+    func makeUIView(context: Context) -> WKWebView {
+        let config = WKWebViewConfiguration()
+        config.websiteDataStore = .default()
+        let webView = WKWebView(frame: .zero, configuration: config)
+        return webView
+    }
+
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        let request = URLRequest(url: url)
+        uiView.load(request)
     }
 }
 
-struct LogSectionView: View {
-    @EnvironmentObject var wsManager: WebSocketManager
-
-    var body: some View {
-        if wsManager.logEntries.isEmpty {
-            Text("No activity yet")
-                .foregroundStyle(.secondary)
-                .font(.caption)
-        } else {
-            NavigationLink(destination: LogView()) {
-                HStack {
-                    Text("Latest:")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(wsManager.logEntries.last ?? "")
-                        .font(.caption)
-                        .lineLimit(1)
-                    Spacer()
-                    Text("\(wsManager.logEntries.count)")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Status Card
-
-struct StatusCardView: View {
-    let section: SectionConfig
-    @EnvironmentObject var wsManager: WebSocketManager
-
-    var body: some View {
-        HStack {
-            Image(systemName: wsManager.isConnected
-                  ? (section.fields?.connected?.icon ?? "checkmark.circle.fill")
-                  : (section.fields?.disconnected?.icon ?? "circle.slash"))
-                .font(.title2)
-                .foregroundStyle(Color(hex: wsManager.isConnected
-                    ? (section.fields?.connected?.color ?? "#34C759")
-                    : (section.fields?.disconnected?.color ?? "#8E8E93")))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(wsManager.isConnected ? "Connected" : "Disconnected")
-                    .font(.body)
-                Text(wsManager.workerStatus)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-// MARK: - Stats Row
-
-struct StatsRowView: View {
-    let section: SectionConfig
-    @EnvironmentObject var wsManager: WebSocketManager
-
-    var body: some View {
-        HStack {
-            ForEach(section.items ?? []) { item in
-                StatItemView(item: item)
-                if item.id != section.items?.last?.id { Divider() }
-            }
-        }
-        .padding(.vertical, 8)
-    }
-}
-
-struct StatItemView: View {
-    let item: ItemConfig
-    @EnvironmentObject var wsManager: WebSocketManager
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: item.icon)
-                .font(.title3)
-                .foregroundStyle(.tint)
-            Text(boundValue)
-                .font(.headline).fontWeight(.semibold)
-            Text(item.label)
-                .font(.caption2).foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    var boundValue: String {
-        switch item.bind {
-        case "tasksCompleted": return "\(wsManager.tasksCompleted)"
-        case "leadsProcessed": return "\(wsManager.leadsProcessed)"
-        case "workerStatus": return wsManager.workerStatus
-        case "hostURL": return wsManager.hostURL
-        case "logCount": return "\(wsManager.logEntries.count)"
-        default: return item.bind ?? item.value ?? ""
-        }
-    }
-}
-
-// MARK: - Button Row
-
-struct ButtonRowView: View {
-    let section: SectionConfig
-    @Binding var showSettings: Bool
-
-    var body: some View {
-        Button { showSettings = true } label: {
-            Label(section.label ?? "Connect", systemImage: section.icon ?? "network")
-        }
-    }
-}
-
-// MARK: - Info Row
-
-struct InfoRowView: View {
-    let section: SectionConfig
-    @EnvironmentObject var wsManager: WebSocketManager
-
-    var body: some View {
-        ForEach(section.items ?? []) { item in
-            HStack {
-                Text(item.label).foregroundStyle(.primary)
-                Spacer()
-                Text(boundValue(for: item)).foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    func boundValue(for item: ItemConfig) -> String {
-        switch item.bind {
-        case "hostURL": return wsManager.hostURL
-        default: return item.value ?? item.bind ?? ""
-        }
-    }
-}
-
-// MARK: - Color Helper
-
-extension Color {
-    init(hex: String) {
-        let s = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        if let n = Int(s, radix: 16) {
-            self.init(red: Double((n >> 16) & 0xFF) / 255,
-                      green: Double((n >> 8) & 0xFF) / 255,
-                      blue: Double(n & 0xFF) / 255)
-        } else { self.init(.gray) }
-    }
-}
-
-// MARK: - JSON Models
+// MARK: - JSON Models (Keep for structural reference / decoding if needed)
 
 struct UIConfig: Codable {
     let version: Int
