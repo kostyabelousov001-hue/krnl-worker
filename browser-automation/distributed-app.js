@@ -46,7 +46,7 @@ const state = {
     diffStats: { new: 0, changed: 0, removed: 0 }
 };
 
-const BATCH_SIZE = 25; // 🔥 Increased from 10 to 25
+const BATCH_SIZE = 5; // 🔥 Reduced from 25 to 5 for better load balancing between host and remote/iOS workers
 
 function log(msg) {
     const time = new Date().toLocaleTimeString();
@@ -1059,6 +1059,13 @@ function startHostServer() {
         state.connectedWorkers.push(worker);
         log(`Worker #${workerId} joined from ${ip}`);
         renderTUI();
+
+        // 🔥 Late-join task dispatch: start working immediately if phase is active
+        if (state.phase === 'EXTRACTING_DETAILS') {
+            dispatchNextDetailsTask(worker);
+        } else if (state.phase === 'WEB_CRAWLING') {
+            dispatchNextWebTask(worker);
+        }
 
         ws.on('message', (message) => {
             try {
