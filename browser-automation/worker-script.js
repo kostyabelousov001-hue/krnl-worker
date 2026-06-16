@@ -10,6 +10,52 @@
     var callbacks = {};
     var callbackCounter = 0;
 
+    // Mutex to protect sequential WebView navigation
+    var webViewMutex = {
+        locked: false,
+        queue: [],
+        acquire: function() {
+            var self = this;
+            return new Promise(function(resolve) {
+                if (!self.locked) {
+                    self.locked = true;
+                    resolve();
+                } else {
+                    self.queue.push(resolve);
+                }
+            });
+        },
+        release: function() {
+            if (this.queue.length > 0) {
+                var next = this.queue.shift();
+                next();
+            } else {
+                this.locked = false;
+            }
+        }
+    };
+
+    // Helper for parallel task execution with concurrency limits
+    async function parallelLimit(items, limit, fn) {
+        var results = [];
+        var index = 0;
+        
+        async function worker() {
+            while (index < items.length) {
+                var currIndex = index++;
+                var res = await fn(items[currIndex], currIndex);
+                results[currIndex] = res;
+            }
+        }
+        
+        var workers = [];
+        for (var i = 0; i < Math.min(limit, items.length); i++) {
+            workers.push(worker());
+        }
+        await Promise.all(workers);
+        return results;
+    }
+
     KRNL.onCallback = function(id, result) {
         if (callbacks[id]) {
             callbacks[id](result);
@@ -468,29 +514,13 @@
             var limit = Math.ceil(leads.length * (settings.crawlPercentage || 1.0));
             log("Crawling " + limit + "/" + leads.length + " websites (WebKit: " + (settings.useWebKit ?? true) + ")...");
             
-            var results = [];
-            for (var i = 0; i < leads.length; i++) {
-                var lead = leads[i];
-                
-                if (i >= limit || !settings.searchWebsites) {
-                    results.push({
-                        name: lead.name,
-                        rating: lead.rating || 'N/A',
-                        reviews: lead.reviews || '0',
-                        phone: lead.phone || 'N/A',
-                        website: lead.website || 'N/A',
-                        url: lead.url || '',
-                        emails: lead.emails || 'N/A',
-                        facebook: 'N/A',
-                        instagram: 'N/A',
-                        linkedin: 'N/A'
-                    });
-                    continue;
-                }
-                
+            var targetLeads = leads.slice(0, limit);
+            
+            // Execute crawls with a concurrency of 4
+            var crawledResults = await parallelLimit(targetLeads, 4, async function(lead, idx) {
                 var website = lead.website;
                 if (!website || website === 'N/A') {
-                    results.push({
+                    return {
                         name: lead.name,
                         rating: lead.rating || 'N/A',
                         reviews: lead.reviews || '0',
@@ -501,17 +531,16 @@
                         facebook: 'N/A',
                         instagram: 'N/A',
                         linkedin: 'N/A'
-                    });
-                    continue;
+                    };
                 }
                 
                 var targetUrl = website.indexOf('http') === 0 ? website : 'http://' + website;
-                log("Crawl (" + (i + 1) + "/" + limit + "): " + targetUrl);
+                log("Crawl (" + (idx + 1) + "/" + limit + "): " + targetUrl);
                 
                 var contacts = { emails: 'N/A', facebook: 'N/A', instagram: 'N/A', linkedin: 'N/A' };
                 
                 if (settings.useWebKit === false) {
-                    // Raw native HTTP request
+                    // Fast parallel HTTP request
                     var html = await fetchHTML(targetUrl);
                     if (html && html !== 'N/A') {
                         contacts = extractContactsFromHTML(html);
@@ -530,54 +559,59 @@
                         }
                     }
                 } else {
-                    // Full WebKit browser load
-                    var loaded = await loadURL(targetUrl);
-                    if (loaded && loaded !== "false") {
-                        await new Promise(function(r) { setTimeout(r, 2000); });
-                        var pageContactsJSON = await evaluateInPage(`(function() {
-                            ${KRNL.extractWebsiteContacts.toString()}
-                            return KRNL.extractWebsiteContacts();
-                        })()`);
-                        
-                        try {
-                            contacts = JSON.parse(pageContactsJSON);
-                        } catch(e) {}
-                        
-                        if (contacts.emails === 'N/A') {
-                            var contactUrlInPage = await evaluateInPage(`(function() {
-                                var links = Array.from(document.querySelectorAll('a'));
-                                var keywords = ['contact', 'about', 'контакт', 'о нас', 'support', 'help', 'career'];
-                                var found = links.find(a => {
-                                    var text = a.textContent.toLowerCase();
-                                    var href = a.getAttribute('href') || '';
-                                    return keywords.some(kw => text.includes(kw) || href.toLowerCase().includes(kw));
-                                });
-                                return found ? found.href : null;
+                    // Full WebKit browser load (Sequentialized via Mutex since there is only 1 WebView instance)
+                    await webViewMutex.acquire();
+                    try {
+                        var loaded = await loadURL(targetUrl);
+                        if (loaded && loaded !== "false") {
+                            await new Promise(function(r) { setTimeout(r, 2000); });
+                            var pageContactsJSON = await evaluateInPage(`(function() {
+                                ${KRNL.extractWebsiteContacts.toString()}
+                                return KRNL.extractWebsiteContacts();
                             })()`);
                             
-                            if (contactUrlInPage && contactUrlInPage.indexOf('http') === 0) {
-                                log("Checking contact page (WebKit): " + contactUrlInPage);
-                                var loadedContact = await loadURL(contactUrlInPage);
-                                if (loadedContact && loadedContact !== "false") {
-                                    await new Promise(function(r) { setTimeout(r, 1500); });
-                                    var contactContactsJSON = await evaluateInPage(`(function() {
-                                        ${KRNL.extractWebsiteContacts.toString()}
-                                        return KRNL.extractWebsiteContacts();
-                                    })()`);
-                                    try {
-                                        var contactContacts = JSON.parse(contactContactsJSON);
-                                        if (contactContacts.emails !== 'N/A') contacts.emails = contactContacts.emails;
-                                        if (contactContacts.facebook !== 'N/A') contacts.facebook = contactContacts.facebook;
-                                        if (contactContacts.instagram !== 'N/A') contacts.instagram = contactContacts.instagram;
-                                        if (contactContacts.linkedin !== 'N/A') contacts.linkedin = contactContacts.linkedin;
-                                    } catch(e) {}
+                            try {
+                                contacts = JSON.parse(pageContactsJSON);
+                            } catch(e) {}
+                            
+                            if (contacts.emails === 'N/A') {
+                                var contactUrlInPage = await evaluateInPage(`(function() {
+                                    var links = Array.from(document.querySelectorAll('a'));
+                                    var keywords = ['contact', 'about', 'контакт', 'о нас', 'support', 'help', 'career'];
+                                    var found = links.find(a => {
+                                        var text = a.textContent.toLowerCase();
+                                        var href = a.getAttribute('href') || '';
+                                        return keywords.some(kw => text.includes(kw) || href.toLowerCase().includes(kw));
+                                    });
+                                    return found ? found.href : null;
+                                })()`);
+                                
+                                if (contactUrlInPage && contactUrlInPage.indexOf('http') === 0) {
+                                    log("Checking contact page (WebKit): " + contactUrlInPage);
+                                    var loadedContact = await loadURL(contactUrlInPage);
+                                    if (loadedContact && loadedContact !== "false") {
+                                        await new Promise(function(r) { setTimeout(r, 1500); });
+                                        var contactContactsJSON = await evaluateInPage(`(function() {
+                                            ${KRNL.extractWebsiteContacts.toString()}
+                                            return KRNL.extractWebsiteContacts();
+                                        })()`);
+                                        try {
+                                            var contactContacts = JSON.parse(contactContactsJSON);
+                                            if (contactContacts.emails !== 'N/A') contacts.emails = contactContacts.emails;
+                                            if (contactContacts.facebook !== 'N/A') contacts.facebook = contactContacts.facebook;
+                                            if (contactContacts.instagram !== 'N/A') contacts.instagram = contactContacts.instagram;
+                                            if (contactContacts.linkedin !== 'N/A') contacts.linkedin = contactContacts.linkedin;
+                                        } catch(e) {}
+                                    }
                                 }
                             }
                         }
+                    } finally {
+                        webViewMutex.release();
                     }
                 }
                 
-                results.push({
+                return {
                     name: lead.name,
                     rating: lead.rating || 'N/A',
                     reviews: lead.reviews || '0',
@@ -588,10 +622,27 @@
                     facebook: contacts.facebook,
                     instagram: contacts.instagram,
                     linkedin: contacts.linkedin
+                };
+            });
+            
+            // Append skipped leads (exceeding crawlPercentage limit)
+            for (var i = limit; i < leads.length; i++) {
+                var lead = leads[i];
+                crawledResults.push({
+                    name: lead.name,
+                    rating: lead.rating || 'N/A',
+                    reviews: lead.reviews || '0',
+                    phone: lead.phone || 'N/A',
+                    website: lead.website || 'N/A',
+                    url: lead.url || '',
+                    emails: lead.emails || 'N/A',
+                    facebook: 'N/A',
+                    instagram: 'N/A',
+                    linkedin: 'N/A'
                 });
             }
             
-            sendWebBatch(results);
+            sendWebBatch(crawledResults);
         } catch(err) {
             log("Error in crawlWebsites: " + err.message);
             sendWebBatch([]);

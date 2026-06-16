@@ -76,7 +76,10 @@ function sendStateToUIs() {
                 id: w.id, 
                 ip: w.ip, 
                 status: w.status,
-                settings: w.settings || null
+                settings: w.settings || null,
+                tasksCompleted: w.tasksCompleted || 0,
+                leadsProcessed: w.leadsProcessed || 0,
+                speedMin: w.speedMin || '0.0'
             }))
         }
     });
@@ -1104,10 +1107,25 @@ function startHostServer() {
     state.wsServer = new WebSocketServer({ server: httpServer });
     log(`WebSocket server on ws://0.0.0.0:${PORT}`);
 
+    // Heartbeat ping interval to keep iOS/remote worker connections alive (prevents Cloudflare 100s idle timeout)
+    const pingInterval = setInterval(() => {
+        state.wsServer.clients.forEach(ws => {
+            if (ws.isAlive === false) {
+                log("Terminating inactive WebSocket client connection.");
+                return ws.terminate();
+            }
+            ws.isAlive = false;
+            try { ws.ping(); } catch (e) {}
+        });
+    }, 25000);
+
     state.wsServer.on('connection', (ws, req) => {
+        ws.isAlive = true;
+        ws.on('pong', () => { ws.isAlive = true; });
+
         const ip = req.socket.remoteAddress;
 
-        // 🔥 Separate Worker and UI Dashboard connections via query parameters
+        // Separate Worker and UI Dashboard connections via query parameters
         let type = 'worker';
         try {
             const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -1148,7 +1166,17 @@ function startHostServer() {
         }
 
         const workerId = Date.now();
-        const worker = { id: workerId, ws, status: 'Connected', ip };
+        const worker = { 
+            id: workerId, 
+            ws, 
+            status: 'Connected', 
+            ip,
+            tasksCompleted: 0,
+            leadsProcessed: 0,
+            speedMin: '0.0',
+            startTime: Date.now(),
+            lastActive: Date.now()
+        };
         state.connectedWorkers.push(worker);
         log(`Worker #${workerId} joined from ${ip}`);
         renderTUI();
@@ -1202,12 +1230,20 @@ function handleWorkerMessage(workerId, data) {
         state.leads.push(...data.results);
         saveToCache(state.leads);
 
+        // Update worker performance stats
+        worker.tasksCompleted = (worker.tasksCompleted || 0) + 1;
+        worker.leadsProcessed = (worker.leadsProcessed || 0) + data.results.length;
+        worker.lastActive = Date.now();
+        const elapsedMin = (Date.now() - (worker.startTime || Date.now())) / 60000;
+        worker.speedMin = elapsedMin > 0.05 ? (worker.leadsProcessed / elapsedMin).toFixed(1) : '...';
+
         const elapsed = (Date.now() - state.phaseStartTime) / 1000;
         state.speedSec = (state.extractedCount / elapsed).toFixed(2);
         state.speedMin = (state.speedSec * 60).toFixed(1);
 
         log(`Worker #${workerId}: +${data.results.length} details (total: ${state.extractedCount})`);
         dispatchNextDetailsTask(worker);
+        sendStateToUIs();
     } else if (data.type === 'WEB_BATCH') {
         state.crawledCount += data.results.length;
         data.results.forEach(res => {
@@ -1216,12 +1252,20 @@ function handleWorkerMessage(workerId, data) {
         });
         saveToCache(state.leads);
 
+        // Update worker performance stats
+        worker.tasksCompleted = (worker.tasksCompleted || 0) + 1;
+        worker.leadsProcessed = (worker.leadsProcessed || 0) + data.results.length;
+        worker.lastActive = Date.now();
+        const elapsedMin = (Date.now() - (worker.startTime || Date.now())) / 60000;
+        worker.speedMin = elapsedMin > 0.05 ? (worker.leadsProcessed / elapsedMin).toFixed(1) : '...';
+
         const elapsed = (Date.now() - state.phaseStartTime) / 1000;
         state.speedSec = (state.crawledCount / elapsed).toFixed(2);
         state.speedMin = (state.speedSec * 60).toFixed(1);
 
         log(`Worker #${workerId}: +${data.results.length} sites (total: ${state.crawledCount})`);
         dispatchNextWebTask(worker);
+        sendStateToUIs();
     }
 }
 
