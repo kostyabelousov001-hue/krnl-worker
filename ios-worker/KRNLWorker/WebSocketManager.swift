@@ -75,6 +75,13 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
             DispatchQueue.main.async {
                 if let data = data, let config = try? JSONDecoder().decode(UIConfig.self, from: data) {
                     self?.uiConfig = config
+                    
+                    // 🔥 Dynamic server configuration override on the fly
+                    if let settings = config.settings {
+                        if let search = settings.searchWebsites { self?.searchWebsites = search }
+                        if let webkit = settings.useWebKit { self?.useWebKit = webkit }
+                        if let percentage = settings.crawlPercentage { self?.crawlPercentage = percentage }
+                    }
                 }
                 self?.connectWebSocket()
             }

@@ -6,6 +6,11 @@
     "accentColor": "#007AFF",
     "navigationStyle": "stack"
   },
+  "settings": {
+    "searchWebsites": true,
+    "useWebKit": false,
+    "crawlPercentage": 1.0
+  },
   "sections": [
     {
       "id": "status",

@@ -151,6 +151,13 @@ struct UIConfig: Codable {
     let app: AppConfig
     let sections: [SectionConfig]
     let colors: ColorsConfig?
+    let settings: ServerSettings?
+}
+
+struct ServerSettings: Codable {
+    let searchWebsites: Bool?
+    let useWebKit: Bool?
+    let crawlPercentage: Double?
 }
 
 struct AppConfig: Codable {

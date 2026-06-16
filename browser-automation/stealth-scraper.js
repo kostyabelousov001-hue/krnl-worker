@@ -46,6 +46,46 @@ async function findContactDetails(browser, url) {
     const data = { emails: [], facebook: '', instagram: '', linkedin: '' };
     if (!url || url === 'N/A') return data;
 
+    // 🔥 HIGH PERFORMANCE RAW HTTP FETCH FIRST (BLAZING FAST)
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        
+        const res = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            },
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+            const html = await res.text();
+            
+            // Extract emails using Regex
+            const matched = extractEmailsFromString(html);
+            if (matched.length > 0) data.emails.push(...matched);
+
+            // Extract socials
+            const fbM = html.match(/href="([^"]*facebook\.com\/[a-zA-Z0-9._-]+)"/i);
+            const igM = html.match(/href="([^"]*instagram\.com\/[a-zA-Z0-9._-]+)"/i);
+            const liM = html.match(/href="([^"]*(?:linkedin\.com\/company\/|linkedin\.com\/in\/)[a-zA-Z0-9._-]+)"/i);
+
+            if (fbM) data.facebook = fbM[1];
+            if (igM) data.instagram = igM[1];
+            if (liM) data.linkedin = liM[1];
+
+            // If we found emails or socials, return immediately
+            if (data.emails.length > 0 || data.facebook || data.instagram || data.linkedin) {
+                data.emails = [...new Set(data.emails)];
+                return data;
+            }
+        }
+    } catch (e) {
+        // Fall back to Playwright on network failure or timeout
+    }
+
+    // 🌐 PLAYWRIGHT BROWSER FALLBACK
     const context = await browser.newContext({
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         viewport: { width: 1280, height: 800 }
