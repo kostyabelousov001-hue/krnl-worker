@@ -1,7 +1,8 @@
 # ⚡ KRNL — Distributed Web Scraper
 
 [![Build iOS Worker](https://github.com/kostyabelousov001-hue/krnl-worker/actions/workflows/ios-build.yml/badge.svg)](https://github.com/kostyabelousov001-hue/krnl-worker/actions/workflows/ios-build.yml)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20iOS-lightgrey)]()
+[![Platform](https://img.shields.io/badge/Desktop-Windows%20%7C%20macOS-lightgrey)]()
+[![Platform](https://img.shields.io/badge/Mobile-iOS-blue)]()
 [![Language](https://img.shields.io/badge/language-Node.js%20%7C%20Swift-blue)]()
 
 Distributed Google Maps scraper with hot-swappable iOS worker app. Scrapes B2B contacts (name, rating, phone, website, email) from Google Maps in parallel across multiple machines.
@@ -15,13 +16,7 @@ npm install
 PORT=8000 node browser-automation/distributed-app.js --auto --query "real estate Dubai" --passes 3
 ```
 
-### Cloudflare Tunnel
-
-```bash
-cloudflared tunnel --protocol http2 run krnl-node
-```
-
-iOS workers connect via `lol.krnlcamel.space` (automatically routed through Cloudflare).
+iOS workers connect via `lol.krnlcamel.space`.
 
 ---
 
