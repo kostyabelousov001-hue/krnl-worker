@@ -253,19 +253,30 @@ async function main() {
 
     log(`Loaded ${rawLeads.length} total raw leads from cache.`);
 
-    // 1. Filter out advertising leads
+    // 1. Filter out advertising leads and leads with invalid/missing phone numbers
     const filteredLeads = [];
     let adCount = 0;
+    let invalidPhoneCount = 0;
     
     for (const lead of rawLeads) {
+        // Filter ads
         if (isAdText(lead.name) || isAdText(lead.website) || isAdText(lead.phone)) {
             adCount++;
             continue;
         }
+        
+        // Filter invalid/missing phone numbers
+        const cleanPhone = lead.phone ? lead.phone.replace(/\D/g, '') : '';
+        if (!lead.phone || lead.phone === 'N/A' || cleanPhone.length < 9 || cleanPhone.length > 15) {
+            invalidPhoneCount++;
+            continue;
+        }
+        
         filteredLeads.push(lead);
     }
     
-    log(`Filtered out ${adCount} advertising items (Google Ads, sponsored, etc.).`);
+    log(`Filtered out ${adCount} advertising items.`);
+    log(`Filtered out ${invalidPhoneCount} leads with invalid or missing phone numbers.`);
 
     // 2. Deduplicate leads by name & phone or name & website
     const seen = new Set();
