@@ -224,15 +224,92 @@
         emails = [...new Set(emails)];
 
         var links = Array.from(document.querySelectorAll('a[href]')).map(function(a) { return a.href; });
-        var fb = links.find(function(l) { return l.includes('facebook.com'); }) || 'N/A';
-        var ig = links.find(function(l) { return l.includes('instagram.com'); }) || 'N/A';
-        var li = links.find(function(l) { return l.includes('linkedin.com'); }) || 'N/A';
+        
+        var findCleanLink = function(linksList, type) {
+            for (var i = 0; i < linksList.length; i++) {
+                var link = linksList[i];
+                if (!link || typeof link !== 'string') continue;
+                var lLower = link.toLowerCase();
+                
+                // Reject share links and ads
+                if (lLower.indexOf('share') !== -1 || lLower.indexOf('sharer') !== -1 || lLower.indexOf('sharearticle') !== -1 || 
+                    lLower.indexOf('intent/tweet') !== -1 || lLower.indexOf('pin/create') !== -1 || lLower.indexOf('reklam') !== -1 || 
+                    lLower.indexOf('widget') !== -1 || lLower.indexOf('plugins') !== -1 || lLower.indexOf('tr.php') !== -1) {
+                    continue;
+                }
+                
+                if (type === 'facebook' && lLower.indexOf('facebook.com') !== -1) {
+                    var fbMatch = link.match(/facebook\.com\/([a-zA-Z0-9_.-]+)/i);
+                    if (fbMatch && ['sharer', 'share', 'plugins', 'tr', 'dialog'].indexOf(fbMatch[1].toLowerCase()) === -1) {
+                        return 'https://facebook.com/' + fbMatch[1];
+                    }
+                }
+                else if (type === 'instagram' && lLower.indexOf('instagram.com') !== -1) {
+                    var igMatch = link.match(/instagram\.com\/([a-zA-Z0-9_.-]+)/i);
+                    if (igMatch && ['p', 'explore', 'developer', 'about', 'legal', 'directory'].indexOf(igMatch[1].toLowerCase()) === -1) {
+                        return 'https://instagram.com/' + igMatch[1];
+                    }
+                }
+                else if (type === 'linkedin' && lLower.indexOf('linkedin.com') !== -1) {
+                    if (lLower.indexOf('/company/') !== -1 || lLower.indexOf('/in/') !== -1 || lLower.indexOf('/pub/') !== -1 || lLower.indexOf('/school/') !== -1) {
+                        return link;
+                    }
+                }
+                else if (type === 'whatsapp' && (lLower.indexOf('wa.me') !== -1 || lLower.indexOf('api.whatsapp.com') !== -1 || lLower.indexOf('whatsapp.com/send') !== -1)) {
+                    if (lLower.indexOf('text=') !== -1 && lLower.indexOf('phone=') === -1) {
+                        continue;
+                    }
+                    var phoneMatch = link.match(/(?:phone=|wa\.me\/|send\?phone=)(\+?[0-9\s\-()]+)/i);
+                    if (phoneMatch) {
+                        var cleanNum = phoneMatch[1].replace(/\D/g, '');
+                        if (cleanNum.length >= 10 && cleanNum.length <= 15) {
+                            return 'https://wa.me/' + cleanNum;
+                        }
+                    } else {
+                        var waMatch = link.match(/wa\.me\/([0-9]+)/i);
+                        if (waMatch && waMatch[1].length >= 10) {
+                            return 'https://wa.me/' + waMatch[1];
+                        }
+                    }
+                }
+                else if (type === 'telegram' && (lLower.indexOf('t.me') !== -1 || lLower.indexOf('telegram.me') !== -1 || lLower.indexOf('telegram.dog') !== -1)) {
+                    var tgMatch = link.match(/(?:t\.me|telegram\.me|telegram\.dog)\/([a-zA-Z0-9_.-]+)/i);
+                    if (tgMatch && ['share', 'addstickers', 'setlanguage', 'contact', 'about', 'joinchat', 's', 'telegram'].indexOf(tgMatch[1].toLowerCase()) === -1) {
+                        return 'https://t.me/' + tgMatch[1];
+                    }
+                }
+                else if (type === 'viber' && (lLower.indexOf('viber.click') !== -1 || lLower.indexOf('chats.viber.com') !== -1 || link.indexOf('viber://') === 0 || lLower.indexOf('viber.me') !== -1)) {
+                    if (lLower.indexOf('viber.click/') !== -1 || lLower.indexOf('chats.viber.com/') !== -1 || lLower.indexOf('viber.me/') !== -1 || (link.indexOf('viber://') === 0 && link.length > 8)) {
+                        return link;
+                    }
+                }
+                else if (type === 'vk' && (lLower.indexOf('vk.com') !== -1 || lLower.indexOf('vk.me') !== -1)) {
+                    var vkMatch = link.match(/(?:vk\.com|vk\.me)\/([a-zA-Z0-9_.-]+)/i);
+                    if (vkMatch && ['share.php', 'share', 'widget', 'images', 'css', 'js', 'widget_community.php'].indexOf(vkMatch[1].toLowerCase()) === -1) {
+                        return 'https://vk.com/' + vkMatch[1];
+                    }
+                }
+            }
+            return 'N/A';
+        };
+
+        var fb = findCleanLink(links, 'facebook');
+        var ig = findCleanLink(links, 'instagram');
+        var li = findCleanLink(links, 'linkedin');
+        var wa = findCleanLink(links, 'whatsapp');
+        var tg = findCleanLink(links, 'telegram');
+        var viber = findCleanLink(links, 'viber');
+        var vk = findCleanLink(links, 'vk');
 
         return JSON.stringify({
             emails: emails.join(', ') || 'N/A',
             fb: fb,
             ig: ig,
-            li: li
+            li: li,
+            whatsapp: wa,
+            telegram: tg,
+            viber: viber,
+            vk: vk
         });
     };
 
@@ -277,7 +354,7 @@
     };
 
     function extractContactsFromHTML(html) {
-        if (!html || html === 'N/A') return { emails: 'N/A', facebook: 'N/A', instagram: 'N/A', linkedin: 'N/A' };
+        if (!html || html === 'N/A') return { emails: 'N/A', facebook: 'N/A', instagram: 'N/A', linkedin: 'N/A', whatsapp: 'N/A', telegram: 'N/A', viber: 'N/A', vk: 'N/A' };
         
         // Emails
         var emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
@@ -291,16 +368,24 @@
         }
         emails = [...new Set(emails)];
         
-        // Socials
+        // Socials & Messengers
         var fbM = html.match(/href="([^"]*facebook\.com\/[a-zA-Z0-9._-]+)"/i);
         var igM = html.match(/href="([^"]*instagram\.com\/[a-zA-Z0-9._-]+)"/i);
         var liM = html.match(/href="([^"]*(?:linkedin\.com\/company\/|linkedin\.com\/in\/)[a-zA-Z0-9._-]+)"/i);
+        var waM = html.match(/href="([^"]*(?:wa\.me|api\.whatsapp\.com|whatsapp\.com\/send)[^"]*)"/i);
+        var tgM = html.match(/href="([^"]*(?:t\.me|telegram\.me|telegram\.dog)\/[a-zA-Z0-9_.-]+)"/i);
+        var vibM = html.match(/href="([^"]*(?:viber\.click|viber:\/\/chat|chats\.viber\.com|viber\.me)[^"]*)"/i);
+        var vkM = html.match(/href="([^"]*(?:vk\.com|vk\.me)\/[a-zA-Z0-9_.-]+)"/i);
         
         return {
             emails: emails.join(', ') || 'N/A',
             facebook: fbM ? fbM[1] : 'N/A',
             instagram: igM ? igM[1] : 'N/A',
-            linkedin: liM ? liM[1] : 'N/A'
+            linkedin: liM ? liM[1] : 'N/A',
+            whatsapp: waM ? waM[1] : 'N/A',
+            telegram: tgM ? tgM[1] : 'N/A',
+            viber: vibM ? vibM[1] : 'N/A',
+            vk: vkM ? vkM[1] : 'N/A'
         };
     }
 
@@ -601,6 +686,10 @@
                                 if (contactContacts.facebook !== 'N/A') contacts.facebook = contactContacts.facebook;
                                 if (contactContacts.instagram !== 'N/A') contacts.instagram = contactContacts.instagram;
                                 if (contactContacts.linkedin !== 'N/A') contacts.linkedin = contactContacts.linkedin;
+                                if (contactContacts.whatsapp !== 'N/A') contacts.whatsapp = contactContacts.whatsapp;
+                                if (contactContacts.telegram !== 'N/A') contacts.telegram = contactContacts.telegram;
+                                if (contactContacts.viber !== 'N/A') contacts.viber = contactContacts.viber;
+                                if (contactContacts.vk !== 'N/A') contacts.vk = contactContacts.vk;
                             }
                         }
                     }
@@ -647,6 +736,10 @@
                                             if (contactContacts.facebook !== 'N/A') contacts.facebook = contactContacts.facebook;
                                             if (contactContacts.instagram !== 'N/A') contacts.instagram = contactContacts.instagram;
                                             if (contactContacts.linkedin !== 'N/A') contacts.linkedin = contactContacts.linkedin;
+                                            if (contactContacts.whatsapp !== 'N/A') contacts.whatsapp = contactContacts.whatsapp;
+                                            if (contactContacts.telegram !== 'N/A') contacts.telegram = contactContacts.telegram;
+                                            if (contactContacts.viber !== 'N/A') contacts.viber = contactContacts.viber;
+                                            if (contactContacts.vk !== 'N/A') contacts.vk = contactContacts.vk;
                                         } catch(e) {}
                                     }
                                 }
@@ -667,7 +760,11 @@
                     emails: contacts.emails,
                     facebook: contacts.facebook,
                     instagram: contacts.instagram,
-                    linkedin: contacts.linkedin
+                    linkedin: contacts.linkedin,
+                    whatsapp: contacts.whatsapp || 'N/A',
+                    telegram: contacts.telegram || 'N/A',
+                    viber: contacts.viber || 'N/A',
+                    vk: contacts.vk || 'N/A'
                 };
             });
             
@@ -684,7 +781,11 @@
                     emails: lead.emails || 'N/A',
                     facebook: 'N/A',
                     instagram: 'N/A',
-                    linkedin: 'N/A'
+                    linkedin: 'N/A',
+                    whatsapp: 'N/A',
+                    telegram: 'N/A',
+                    viber: 'N/A',
+                    vk: 'N/A'
                 });
             }
             

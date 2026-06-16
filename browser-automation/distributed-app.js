@@ -186,17 +186,62 @@ function escapeXml(unsafe) {
 
 function generateHTMLReport(leads) {
     const htmlPath = path.join(__dirname, 'leads.html');
-    const rows = leads.map((l, idx) => `
-        <tr style="--animation-order: ${idx};">
+    const rows = leads.map((l, idx) => {
+        // Badges HTML
+        const emailBadge = l.emails && l.emails !== 'N/A' 
+            ? l.emails.split(', ').map(em => `<a href="mailto:${em}" class="email-badge">${escapeHtml(em)}</a>`).join(' ') 
+            : '<span class="na">N/A</span>';
+
+        const waBadge = l.whatsapp && l.whatsapp !== 'N/A'
+            ? `<a href="${l.whatsapp}" target="_blank" class="social-badge wa-badge">💬 WhatsApp</a>`
+            : '';
+
+        const tgBadge = l.telegram && l.telegram !== 'N/A'
+            ? `<a href="${l.telegram}" target="_blank" class="social-badge tg-badge">✈️ Telegram</a>`
+            : '';
+
+        const vkBadge = l.vk && l.vk !== 'N/A'
+            ? `<a href="${l.vk}" target="_blank" class="social-badge vk-badge">vk VK</a>`
+            : '';
+
+        const viberBadge = l.viber && l.viber !== 'N/A'
+            ? `<a href="${l.viber}" target="_blank" class="social-badge viber-badge">📞 Viber</a>`
+            : '';
+
+        const fbBadge = l.facebook && l.facebook !== 'N/A'
+            ? `<a href="${l.facebook}" target="_blank" class="social-badge fb-badge">📘 FB</a>`
+            : '';
+
+        const igBadge = l.instagram && l.instagram !== 'N/A'
+            ? `<a href="${l.instagram}" target="_blank" class="social-badge ig-badge">📸 IG</a>`
+            : '';
+
+        const liBadge = l.linkedin && l.linkedin !== 'N/A'
+            ? `<a href="${l.linkedin}" target="_blank" class="social-badge li-badge">💼 LN</a>`
+            : '';
+
+        const socialsHtml = [waBadge, tgBadge, vkBadge, viberBadge, fbBadge, igBadge, liBadge].filter(Boolean).join(' ');
+
+        // Filters attributes
+        const hasWa = l.whatsapp && l.whatsapp !== 'N/A' ? 'true' : 'false';
+        const hasTg = l.telegram && l.telegram !== 'N/A' ? 'true' : 'false';
+        const hasVk = l.vk && l.vk !== 'N/A' ? 'true' : 'false';
+        const hasViber = l.viber && l.viber !== 'N/A' ? 'true' : 'false';
+        const hasEmails = l.emails && l.emails !== 'N/A' ? 'true' : 'false';
+
+        return `
+        <tr style="--animation-order: ${idx};" data-has-wa="${hasWa}" data-has-tg="${hasTg}" data-has-vk="${hasVk}" data-has-viber="${hasViber}" data-has-emails="${hasEmails}">
             <td class="num-cell">${idx + 1}</td>
             <td class="name-cell">${escapeHtml(l.name || 'N/A')}</td>
             <td class="rating-cell">${l.rating && l.rating !== 'N/A' ? `⭐ <span>${l.rating}</span>` : '<span class="na">N/A</span>'}</td>
             <td class="reviews-cell">${l.reviews && l.reviews !== 'N/A' ? l.reviews : '0'}</td>
             <td class="phone-cell">${l.phone && l.phone !== 'N/A' ? `<a href="tel:${l.phone.replace(/\s+/g, '')}">${escapeHtml(l.phone)}</a>` : '<span class="na">N/A</span>'}</td>
             <td class="website-cell">${l.website && l.website !== 'N/A' ? `<a href="${l.website.startsWith('http') ? l.website : 'http://' + l.website}" target="_blank" class="web-btn">🌐 Visit</a>` : '<span class="na">N/A</span>'}</td>
-            <td class="email-cell">${l.emails && l.emails !== 'N/A' ? l.emails.split(', ').map(em => `<a href="mailto:${em}" class="email-badge">${escapeHtml(em)}</a>`).join(' ') : '<span class="na">N/A</span>'}</td>
+            <td class="email-cell">${emailBadge}</td>
+            <td class="socials-cell">${socialsHtml || '<span class="na">N/A</span>'}</td>
         </tr>
-    `).join('\n');
+        `;
+    }).join('\n');
 
     const htmlContent = `<!DOCTYPE html>
 <html lang="ru">
@@ -227,7 +272,7 @@ function generateHTMLReport(leads) {
             padding: 3rem 1.5rem;
             overflow-x: hidden;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 1500px; margin: 0 auto; }
         header {
             display: flex;
             flex-direction: column;
@@ -264,7 +309,7 @@ function generateHTMLReport(leads) {
         header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
@@ -342,8 +387,15 @@ function generateHTMLReport(leads) {
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
             transform: translateY(-2px);
         }
-        .controls { margin-bottom: 1.5rem; position: relative; }
-        .search-wrapper { position: relative; display: flex; align-items: center; }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .search-wrapper { position: relative; display: flex; align-items: center; flex: 1; min-width: 300px; }
         .search-icon { position: absolute; left: 1.25rem; color: var(--text-muted); font-size: 1.2rem; pointer-events: none; }
         input[type="text"] {
             width: 100%;
@@ -361,6 +413,32 @@ function generateHTMLReport(leads) {
         input[type="text"]:focus {
             border-color: var(--accent);
             box-shadow: 0 0 25px rgba(99, 102, 241, 0.2), 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            padding: 0.6rem 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+        .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
         }
         .table-card {
             background: var(--panel-bg);
@@ -398,7 +476,7 @@ function generateHTMLReport(leads) {
         }
         tr:hover td { background: rgba(255, 255, 255, 0.02); }
         .num-cell { color: var(--text-muted); font-weight: 600; width: 60px; }
-        .name-cell { font-weight: 700; color: #ffffff; font-size: 1rem; }
+        .name-cell { font-weight: 700; color: #ffffff; font-size: 1rem; max-width: 250px; }
         .rating-cell { color: var(--gold); font-weight: 700; white-space: nowrap; }
         .rating-cell span { color: #ffffff; margin-left: 4px; }
         .reviews-cell { font-weight: 600; color: #e5e7eb; }
@@ -426,9 +504,9 @@ function generateHTMLReport(leads) {
         .email-badge {
             display: inline-block;
             padding: 0.25rem 0.6rem;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            color: #34d399 !important;
+            background: rgba(236, 72, 153, 0.1);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            color: #f472b6 !important;
             border-radius: 4px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -436,19 +514,93 @@ function generateHTMLReport(leads) {
             text-decoration: none !important;
         }
         .email-badge:hover {
-            background: rgba(16, 185, 129, 0.25);
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+            background: #ec4899;
+            color: #ffffff !important;
+        }
+        .social-badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 2px;
+            text-decoration: none !important;
+        }
+        .wa-badge {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #4ade80 !important;
+        }
+        .wa-badge:hover {
+            background: #22c55e;
+            color: #fff !important;
+        }
+        .tg-badge {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            color: #22d3ee !important;
+        }
+        .tg-badge:hover {
+            background: #06b6d4;
+            color: #fff !important;
+        }
+        .vk-badge {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            color: #60a5fa !important;
+        }
+        .vk-badge:hover {
+            background: #2563eb;
+            color: #fff !important;
+        }
+        .viber-badge {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: #c084fc !important;
+        }
+        .viber-badge:hover {
+            background: #8b5cf6;
+            color: #fff !important;
+        }
+        .fb-badge {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #60a5fa !important;
+        }
+        .fb-badge:hover {
+            background: #3b82f6;
+            color: #fff !important;
+        }
+        .ig-badge {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            color: #fb7185 !important;
+        }
+        .ig-badge:hover {
+            background: #f43f5e;
+            color: #fff !important;
+        }
+        .li-badge {
+            background: rgba(14, 116, 144, 0.1);
+            border: 1px solid rgba(14, 116, 144, 0.2);
+            color: #22d3ee !important;
+        }
+        .li-badge:hover {
+            background: #0e7490;
+            color: #fff !important;
         }
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             header h1 { font-size: 2.2rem; }
             body { padding: 1.5rem 1rem; }
             .export-section { flex-direction: column; align-items: flex-start; }
             .export-buttons { width: 100%; }
             .export-btn { flex: 1; justify-content: center; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .filter-buttons { justify-content: center; }
         }
     </style>
 </head>
@@ -476,8 +628,12 @@ function generateHTMLReport(leads) {
                 <div class="stat-value">${leads.filter(l => l.website && l.website !== 'N/A').length} <span>(${((leads.filter(l => l.website && l.website !== 'N/A').length / leads.length) * 100 || 0).toFixed(0)}%)</span></div>
             </div>
             <div class="stat-card">
-                <div class="stat-title">С почтой (Emails)</div>
-                <div class="stat-value">${leads.filter(l => l.emails && l.emails !== 'N/A').length} <span>(${((leads.filter(l => l.emails && l.emails !== 'N/A').length / leads.length) * 100 || 0).toFixed(0)}%)</span></div>
+                <div class="stat-title">С WhatsApp</div>
+                <div class="stat-value">${leads.filter(l => l.whatsapp && l.whatsapp !== 'N/A').length} <span>(${((leads.filter(l => l.whatsapp && l.whatsapp !== 'N/A').length / leads.length) * 100 || 0).toFixed(0)}%)</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">С Telegram</div>
+                <div class="stat-value">${leads.filter(l => l.telegram && l.telegram !== 'N/A').length} <span>(${((leads.filter(l => l.telegram && l.telegram !== 'N/A').length / leads.length) * 100 || 0).toFixed(0)}%)</span></div>
             </div>
         </div>
 
@@ -498,6 +654,14 @@ function generateHTMLReport(leads) {
                 <span class="search-icon">🔍</span>
                 <input type="text" id="search-input" placeholder="Поиск по названию, телефону, сайту, почте...">
             </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Все лиды</button>
+                <button class="filter-btn" data-filter="wa">With WhatsApp</button>
+                <button class="filter-btn" data-filter="tg">With Telegram</button>
+                <button class="filter-btn" data-filter="vk">With VK</button>
+                <button class="filter-btn" data-filter="viber">With Viber</button>
+                <button class="filter-btn" data-filter="emails">With Emails</button>
+            </div>
         </div>
 
         <div class="table-card">
@@ -512,6 +676,7 @@ function generateHTMLReport(leads) {
                             <th>Телефон</th>
                             <th>Сайт</th>
                             <th>Электронная почта</th>
+                            <th>Соцсети & Мессенджеры</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
@@ -524,16 +689,28 @@ function generateHTMLReport(leads) {
 
     <script>
         const searchInput = document.getElementById('search-input');
+        const filterBtns = document.querySelectorAll('.filter-btn');
         const tableBody = document.getElementById('table-body');
         const rows = Array.from(tableBody.querySelectorAll('tr'));
         const totalCount = document.getElementById('total-count');
 
-        searchInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase().trim();
+        let activeFilter = 'all';
+        let searchQuery = '';
+
+        function updateList() {
             let visibleCount = 0;
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
-                if (text.includes(val)) {
+                const matchesSearch = text.includes(searchQuery);
+                
+                let matchesFilter = true;
+                if (activeFilter === 'wa') matchesFilter = row.getAttribute('data-has-wa') === 'true';
+                else if (activeFilter === 'tg') matchesFilter = row.getAttribute('data-has-tg') === 'true';
+                else if (activeFilter === 'vk') matchesFilter = row.getAttribute('data-has-vk') === 'true';
+                else if (activeFilter === 'viber') matchesFilter = row.getAttribute('data-has-viber') === 'true';
+                else if (activeFilter === 'emails') matchesFilter = row.getAttribute('data-has-emails') === 'true';
+
+                if (matchesSearch && matchesFilter) {
                     row.style.display = '';
                     visibleCount++;
                 } else {
@@ -541,6 +718,20 @@ function generateHTMLReport(leads) {
                 }
             });
             totalCount.textContent = visibleCount;
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            updateList();
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeFilter = btn.getAttribute('data-filter');
+                updateList();
+            });
         });
     </script>
 </body>
@@ -848,14 +1039,21 @@ function finalizeOutputs() {
         leads = removeDuplicates(leads);
         saveToJson(leads);
 
-        const header = 'Business Name;Rating;Review Count;Phone;Website;Emails\n';
+        const header = 'Business Name;Rating;Review Count;Phone;Website;Emails;WhatsApp;Telegram;Viber;VK;Facebook;Instagram;LinkedIn\n';
         const rows = leads.map(l => [
             l.name   || 'N/A',
             (l.rating && l.rating !== 'N/A') ? ('="' + l.rating.replace(/[="]/g, '') + '"') : 'N/A',
             l.reviews || '0',
             l.phone   || 'N/A',
             l.website || 'N/A',
-            l.emails  || 'N/A'
+            l.emails  || 'N/A',
+            l.whatsapp || 'N/A',
+            l.telegram || 'N/A',
+            l.viber    || 'N/A',
+            l.vk       || 'N/A',
+            l.facebook || 'N/A',
+            l.instagram || 'N/A',
+            l.linkedin  || 'N/A'
         ].map(cell => {
             const s = String(cell);
             if (s.startsWith('="') && s.endsWith('"') && !s.slice(2, -1).includes(';') && !s.slice(2, -1).includes('"')) {

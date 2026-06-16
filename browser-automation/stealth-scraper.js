@@ -27,23 +27,155 @@ async function setupResourceBlocking(page, blockStylesheets = true) {
     });
 }
 
+function isValidSocialLink(url, type) {
+    if (!url || typeof url !== 'string') return false;
+    const link = url.trim();
+    const lLower = link.toLowerCase();
+
+    // Reject share links, widgets, tracking, and ads
+    if (lLower.includes('share') || lLower.includes('sharer') || lLower.includes('sharearticle') || 
+        lLower.includes('intent/tweet') || lLower.includes('pin/create') || lLower.includes('reklam') || 
+        lLower.includes('widget') || lLower.includes('plugins') || lLower.includes('tr.php')) {
+        return false;
+    }
+
+    if (type === 'facebook') {
+        const match = link.match(/facebook\.com\/([a-zA-Z0-9_.-]+)/i);
+        if (!match) return false;
+        return !['sharer', 'share', 'plugins', 'tr', 'dialog'].includes(match[1].toLowerCase());
+    }
+    if (type === 'instagram') {
+        const match = link.match(/instagram\.com\/([a-zA-Z0-9_.-]+)/i);
+        if (!match) return false;
+        return !['p', 'explore', 'developer', 'about', 'legal', 'directory'].includes(match[1].toLowerCase());
+    }
+    if (type === 'linkedin') {
+        return lLower.includes('/company/') || lLower.includes('/in/') || lLower.includes('/pub/') || lLower.includes('/school/');
+    }
+    if (type === 'whatsapp') {
+        if (lLower.includes('text=') && !lLower.includes('phone=')) {
+            return false; // share link
+        }
+        // Extract phone number digits
+        const match = link.match(/(?:phone=|wa\.me\/|send\?phone=)(\+?[0-9\s\-()]+)/i);
+        if (match) {
+            const cleanNum = match[1].replace(/\D/g, '');
+            return cleanNum.length >= 10 && cleanNum.length <= 15;
+        }
+        const waMatch = link.match(/wa\.me\/([0-9]+)/i);
+        return !!waMatch && waMatch[1].length >= 10;
+    }
+    if (type === 'telegram') {
+        const match = link.match(/(?:t\.me|telegram\.me|telegram\.dog)\/([a-zA-Z0-9_.-]+)/i);
+        if (!match) return false;
+        return !['share', 'addstickers', 'setlanguage', 'contact', 'about', 'joinchat', 's', 'telegram'].includes(match[1].toLowerCase());
+    }
+    if (type === 'viber') {
+        return lLower.includes('viber.click/') || lLower.includes('chats.viber.com/') || lLower.includes('viber.me/') || (lLower.startsWith('viber://') && lLower.length > 8);
+    }
+    if (type === 'vk') {
+        const match = link.match(/(?:vk\.com|vk\.me)\/([a-zA-Z0-9_.-]+)/i);
+        if (!match) return false;
+        return !['share.php', 'share', 'widget', 'images', 'css', 'js', 'widget_community.php'].includes(match[1].toLowerCase());
+    }
+
+    return true;
+}
+
+function extractSocialsFromHtml(html) {
+    const data = { facebook: '', instagram: '', linkedin: '', whatsapp: '', telegram: '', viber: '', vk: '' };
+    if (!html) return data;
+    
+    const hrefRegex = /href="([^"]+)"/ig;
+    let match;
+    const links = [];
+    while ((match = hrefRegex.exec(html)) !== null) {
+        links.push(match[1]);
+    }
+    
+    for (const link of links) {
+        const lLower = link.toLowerCase();
+        
+        if (lLower.includes('facebook.com') && !data.facebook && isValidSocialLink(link, 'facebook')) {
+            const m = link.match(/facebook\.com\/([a-zA-Z0-9_.-]+)/i);
+            if (m) data.facebook = `https://facebook.com/${m[1]}`;
+        }
+        else if (lLower.includes('instagram.com') && !data.instagram && isValidSocialLink(link, 'instagram')) {
+            const m = link.match(/instagram\.com\/([a-zA-Z0-9_.-]+)/i);
+            if (m) data.instagram = `https://instagram.com/${m[1]}`;
+        }
+        else if (lLower.includes('linkedin.com') && !data.linkedin && isValidSocialLink(link, 'linkedin')) {
+            data.linkedin = link;
+        }
+        else if ((lLower.includes('wa.me') || lLower.includes('api.whatsapp.com') || lLower.includes('whatsapp.com/send')) && !data.whatsapp && isValidSocialLink(link, 'whatsapp')) {
+            const phoneMatch = link.match(/(?:phone=|wa\.me\/|send\?phone=)(\+?[0-9\s\-()]+)/i);
+            if (phoneMatch) {
+                data.whatsapp = `https://wa.me/${phoneMatch[1].replace(/\D/g, '')}`;
+            } else {
+                data.whatsapp = link;
+            }
+        }
+        else if ((lLower.includes('t.me') || lLower.includes('telegram.me') || lLower.includes('telegram.dog')) && !data.telegram && isValidSocialLink(link, 'telegram')) {
+            const tgMatch = link.match(/(?:t\.me|telegram\.me|telegram\.dog)\/([a-zA-Z0-9_.-]+)/i);
+            if (tgMatch) data.telegram = `https://t.me/${tgMatch[1]}`;
+        }
+        else if ((lLower.includes('viber.click') || lLower.includes('chats.viber.com') || link.startsWith('viber://') || lLower.includes('viber.me')) && !data.viber && isValidSocialLink(link, 'viber')) {
+            data.viber = link;
+        }
+        else if ((lLower.includes('vk.com') || lLower.includes('vk.me')) && !data.vk && isValidSocialLink(link, 'vk')) {
+            const vkMatch = link.match(/(?:vk\.com|vk\.me)\/([a-zA-Z0-9_.-]+)/i);
+            if (vkMatch) data.vk = `https://vk.com/${vkMatch[1]}`;
+        }
+    }
+    return data;
+}
+
 async function extractSocialsFromPage(page) {
-    const data = { facebook: '', instagram: '', linkedin: '' };
+    const data = { facebook: '', instagram: '', linkedin: '', whatsapp: '', telegram: '', viber: '', vk: '' };
     try {
         const links = await page.locator('a').evaluateAll(anchors =>
             anchors.map(a => a.href).filter(href => href && href.startsWith('http'))
         ).catch(() => []);
+        
         for (const link of links) {
-            if (link.includes('facebook.com') && !data.facebook) data.facebook = link;
-            else if (link.includes('instagram.com') && !data.instagram) data.instagram = link;
-            else if (link.includes('linkedin.com') && !data.linkedin) data.linkedin = link;
+            const lLower = link.toLowerCase();
+            if (lLower.includes('facebook.com') && !data.facebook && isValidSocialLink(link, 'facebook')) {
+                const m = link.match(/facebook\.com\/([a-zA-Z0-9_.-]+)/i);
+                if (m) data.facebook = `https://facebook.com/${m[1]}`;
+            }
+            else if (lLower.includes('instagram.com') && !data.instagram && isValidSocialLink(link, 'instagram')) {
+                const m = link.match(/instagram\.com\/([a-zA-Z0-9_.-]+)/i);
+                if (m) data.instagram = `https://instagram.com/${m[1]}`;
+            }
+            else if (lLower.includes('linkedin.com') && !data.linkedin && isValidSocialLink(link, 'linkedin')) {
+                data.linkedin = link;
+            }
+            else if ((lLower.includes('wa.me') || lLower.includes('api.whatsapp.com') || lLower.includes('whatsapp.com/send')) && !data.whatsapp && isValidSocialLink(link, 'whatsapp')) {
+                const phoneMatch = link.match(/(?:phone=|wa\.me\/|send\?phone=)(\+?[0-9\s\-()]+)/i);
+                if (phoneMatch) {
+                    data.whatsapp = `https://wa.me/${phoneMatch[1].replace(/\D/g, '')}`;
+                } else {
+                    data.whatsapp = link;
+                }
+            }
+            else if ((lLower.includes('t.me') || lLower.includes('telegram.me') || lLower.includes('telegram.dog')) && !data.telegram && isValidSocialLink(link, 'telegram')) {
+                const tgMatch = link.match(/(?:t\.me|telegram\.me|telegram\.dog)\/([a-zA-Z0-9_.-]+)/i);
+                if (tgMatch) data.telegram = `https://t.me/${tgMatch[1]}`;
+            }
+            else if ((lLower.includes('viber.click') || lLower.includes('chats.viber.com') || link.startsWith('viber://') || lLower.includes('viber.me')) && !data.viber && isValidSocialLink(link, 'viber')) {
+                data.viber = link;
+            }
+            else if ((lLower.includes('vk.com') || lLower.includes('vk.me')) && !data.vk && isValidSocialLink(link, 'vk')) {
+                const vkMatch = link.match(/(?:vk\.com|vk\.me)\/([a-zA-Z0-9_.-]+)/i);
+                if (vkMatch) data.vk = `https://vk.com/${vkMatch[1]}`;
+            }
         }
     } catch (e) {}
     return data;
 }
 
 async function findContactDetails(browser, url) {
-    const data = { emails: [], facebook: '', instagram: '', linkedin: '' };
+    const data = { emails: [], facebook: '', instagram: '', linkedin: '', whatsapp: '', telegram: '', viber: '', vk: '' };
     if (!url || url === 'N/A') return data;
 
     // 🔥 HIGH PERFORMANCE RAW HTTP FETCH FIRST (BLAZING FAST)
@@ -66,17 +198,18 @@ async function findContactDetails(browser, url) {
             const matched = extractEmailsFromString(html);
             if (matched.length > 0) data.emails.push(...matched);
 
-            // Extract socials
-            const fbM = html.match(/href="([^"]*facebook\.com\/[a-zA-Z0-9._-]+)"/i);
-            const igM = html.match(/href="([^"]*instagram\.com\/[a-zA-Z0-9._-]+)"/i);
-            const liM = html.match(/href="([^"]*(?:linkedin\.com\/company\/|linkedin\.com\/in\/)[a-zA-Z0-9._-]+)"/i);
+            // Extract socials & messengers using HTML link extractor
+            const socials = extractSocialsFromHtml(html);
+            if (socials.facebook) data.facebook = socials.facebook;
+            if (socials.instagram) data.instagram = socials.instagram;
+            if (socials.linkedin) data.linkedin = socials.linkedin;
+            if (socials.whatsapp) data.whatsapp = socials.whatsapp;
+            if (socials.telegram) data.telegram = socials.telegram;
+            if (socials.viber) data.viber = socials.viber;
+            if (socials.vk) data.vk = socials.vk;
 
-            if (fbM) data.facebook = fbM[1];
-            if (igM) data.instagram = igM[1];
-            if (liM) data.linkedin = liM[1];
-
-            // If we found emails or socials, return immediately
-            if (data.emails.length > 0 || data.facebook || data.instagram || data.linkedin) {
+            // If we found emails or messengers, return immediately
+            if (data.emails.length > 0 || data.facebook || data.instagram || data.linkedin || data.whatsapp || data.telegram || data.viber || data.vk) {
                 data.emails = [...new Set(data.emails)];
                 return data;
             }
@@ -103,6 +236,10 @@ async function findContactDetails(browser, url) {
         data.facebook = socials.facebook;
         data.instagram = socials.instagram;
         data.linkedin = socials.linkedin;
+        data.whatsapp = socials.whatsapp;
+        data.telegram = socials.telegram;
+        data.viber = socials.viber;
+        data.vk = socials.vk;
 
         if (data.emails.length === 0) {
             const contactUrl = await page.evaluate(() => {
@@ -121,6 +258,16 @@ async function findContactDetails(browser, url) {
                 const contactContent = await page.content().catch(() => '');
                 const contactEmails = extractEmailsFromString(contactContent);
                 if (contactEmails.length > 0) data.emails.push(...contactEmails);
+                
+                // Grab messengers on contact page too
+                const contactSocials = await extractSocialsFromPage(page);
+                if (contactSocials.facebook && !data.facebook) data.facebook = contactSocials.facebook;
+                if (contactSocials.instagram && !data.instagram) data.instagram = contactSocials.instagram;
+                if (contactSocials.linkedin && !data.linkedin) data.linkedin = contactSocials.linkedin;
+                if (contactSocials.whatsapp && !data.whatsapp) data.whatsapp = contactSocials.whatsapp;
+                if (contactSocials.telegram && !data.telegram) data.telegram = contactSocials.telegram;
+                if (contactSocials.viber && !data.viber) data.viber = contactSocials.viber;
+                if (contactSocials.vk && !data.vk) data.vk = contactSocials.vk;
             }
         }
         data.emails = [...new Set(data.emails)];
