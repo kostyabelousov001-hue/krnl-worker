@@ -197,21 +197,27 @@ class ScraperEngine: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     // MARK: - API entries called from WebSocketManager
     
     func discover(query: String, pass: Int) {
-        let js = "if (KRNL.discover) KRNL.discover(\"\(query)\", \(pass));"
-        controllerWebView?.evaluateJavaScript(js, completionHandler: nil)
+        DispatchQueue.main.async {
+            let js = "if (KRNL.discover) KRNL.discover(\"\(query)\", \(pass));"
+            self.controllerWebView?.evaluateJavaScript(js, completionHandler: nil)
+        }
     }
     
     func extractDetails(_ items: [TaskItem]) {
-        if let data = try? JSONEncoder().encode(items), let jsonStr = String(data: data, encoding: .utf8) {
-            let js = "if (KRNL.extractDetails) KRNL.extractDetails(\(jsonStr));"
-            controllerWebView?.evaluateJavaScript(js, completionHandler: nil)
+        DispatchQueue.main.async {
+            if let data = try? JSONEncoder().encode(items), let jsonStr = String(data: data, encoding: .utf8) {
+                let js = "if (KRNL.extractDetails) KRNL.extractDetails(\(jsonStr));"
+                self.controllerWebView?.evaluateJavaScript(js, completionHandler: nil)
+            }
         }
     }
     
     func crawlWebsites(_ leads: [LeadItem]) {
-        if let data = try? JSONEncoder().encode(leads), let jsonStr = String(data: data, encoding: .utf8) {
-            let js = "if (KRNL.crawlWebsites) KRNL.crawlWebsites(\(jsonStr));"
-            controllerWebView?.evaluateJavaScript(js, completionHandler: nil)
+        DispatchQueue.main.async {
+            if let data = try? JSONEncoder().encode(leads), let jsonStr = String(data: data, encoding: .utf8) {
+                let js = "if (KRNL.crawlWebsites) KRNL.crawlWebsites(\(jsonStr));"
+                self.controllerWebView?.evaluateJavaScript(js, completionHandler: nil)
+            }
         }
     }
 }

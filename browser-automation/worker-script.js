@@ -64,10 +64,24 @@
     };
 
     // Bridge helpers (Promises)
+    // Bridge helpers (Promises) with robust safety timeouts
     function loadURL(url) {
         return new Promise(function(resolve) {
             var id = "cb_" + (++callbackCounter);
-            callbacks[id] = resolve;
+            
+            var timer = setTimeout(function() {
+                if (callbacks[id]) {
+                    delete callbacks[id];
+                    log("Timeout loading URL: " + url + " after 12s. Forcing skip.");
+                    resolve("false");
+                }
+            }, 12000);
+
+            callbacks[id] = function(res) {
+                clearTimeout(timer);
+                resolve(res);
+            };
+
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.krnlBridge) {
                 window.webkit.messageHandlers.krnlBridge.postMessage({
                     action: "loadURL",
@@ -75,6 +89,8 @@
                     callback: id
                 });
             } else {
+                clearTimeout(timer);
+                delete callbacks[id];
                 resolve("false");
             }
         });
@@ -83,7 +99,20 @@
     function evaluateInPage(jsCode) {
         return new Promise(function(resolve) {
             var id = "cb_" + (++callbackCounter);
-            callbacks[id] = resolve;
+
+            var timer = setTimeout(function() {
+                if (callbacks[id]) {
+                    delete callbacks[id];
+                    log("Timeout evaluating JS in page after 4s. Forcing skip.");
+                    resolve("N/A");
+                }
+            }, 4000);
+
+            callbacks[id] = function(res) {
+                clearTimeout(timer);
+                resolve(res);
+            };
+
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.krnlBridge) {
                 window.webkit.messageHandlers.krnlBridge.postMessage({
                     action: "evaluateInPage",
@@ -91,6 +120,8 @@
                     callback: id
                 });
             } else {
+                clearTimeout(timer);
+                delete callbacks[id];
                 resolve("N/A");
             }
         });
@@ -99,7 +130,20 @@
     function fetchHTML(url) {
         return new Promise(function(resolve) {
             var id = "cb_" + (++callbackCounter);
-            callbacks[id] = resolve;
+
+            var timer = setTimeout(function() {
+                if (callbacks[id]) {
+                    delete callbacks[id];
+                    log("Timeout fetching HTML for: " + url + " after 6s. Forcing skip.");
+                    resolve("N/A");
+                }
+            }, 6000);
+
+            callbacks[id] = function(res) {
+                clearTimeout(timer);
+                resolve(res);
+            };
+
             if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.krnlBridge) {
                 window.webkit.messageHandlers.krnlBridge.postMessage({
                     action: "fetchHTML",
@@ -107,6 +151,8 @@
                     callback: id
                 });
             } else {
+                clearTimeout(timer);
+                delete callbacks[id];
                 resolve("N/A");
             }
         });
