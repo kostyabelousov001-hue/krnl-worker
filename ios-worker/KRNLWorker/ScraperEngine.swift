@@ -267,6 +267,7 @@ class ScraperEngine: NSObject {
         
         processNext(index: 0)
     }
+}
 
 struct PlaceJS: Codable { let name: String; let phone: String; let website: String }
 struct WebsiteJS_fast: Codable { let emails: String; let fb: String; let ig: String; let li: String }
