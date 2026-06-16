@@ -127,6 +127,45 @@ function formatWhatsAppLink(phone) {
     return 'N/A';
 }
 
+// Check if a phone number is a mobile phone number (vs landline)
+function isMobilePhone(phone) {
+    if (!phone || phone === 'N/A') return false;
+    const digits = phone.replace(/\D/g, '');
+    
+    // Russian federation / Kazakhstan (+7)
+    if (digits.length === 11 && (digits.startsWith('79') || digits.startsWith('89'))) {
+        return true;
+    }
+    // Russian mobile without country code (starts with 9, 10 digits)
+    if (digits.length === 10 && digits.startsWith('9')) {
+        return true;
+    }
+    
+    // Ukraine (+380)
+    if (digits.startsWith('380') && digits.length === 12) {
+        const mobilePrefixes = ['50', '63', '66', '67', '68', '73', '91', '92', '93', '94', '95', '96', '97', '98', '99'];
+        const sub = digits.slice(3, 5);
+        return mobilePrefixes.includes(sub);
+    }
+    
+    // UAE (+971)
+    if (digits.startsWith('971') && digits.length === 12) {
+        const mobilePrefixes = ['50', '52', '54', '55', '56', '58'];
+        const sub = digits.slice(3, 5);
+        return mobilePrefixes.includes(sub);
+    }
+    if (digits.length === 9 && digits.startsWith('5')) {
+        return true;
+    }
+
+    // Landline prefixes check for Russia (+7) - starts with 73, 74, 78 (typical landlines)
+    if (digits.length === 11 && (digits.startsWith('73') || digits.startsWith('74') || digits.startsWith('78'))) {
+        return false;
+    }
+
+    return true; // default fallback
+}
+
 // Active Telegram Account Verification
 async function verifyTelegramLink(url) {
     if (!url || url === 'N/A') return { status: 'N/A', url: 'N/A' };
@@ -334,8 +373,8 @@ async function main() {
         lead.instagram = isValidSocialLink(lead.instagram, 'instagram') ? lead.instagram : 'N/A';
         lead.linkedin = isValidSocialLink(lead.linkedin, 'linkedin') ? lead.linkedin : 'N/A';
 
-        // Auto-generate WhatsApp wa.me link from phone number if no whatsapp link scraped
-        if (lead.whatsapp === 'N/A' && lead.phone !== 'N/A') {
+        // Auto-generate WhatsApp wa.me link from phone number if no whatsapp link scraped and it is a mobile number
+        if (lead.whatsapp === 'N/A' && lead.phone !== 'N/A' && isMobilePhone(lead.phone)) {
             const autoWa = formatWhatsAppLink(lead.phone);
             if (autoWa !== 'N/A') {
                 lead.whatsapp = autoWa;
@@ -380,20 +419,32 @@ async function main() {
         }
     });
 
-    log(`Validation complete. Writing results...`, 'SUCCESS');
+    log(`Validation complete. Filtering out leads without active messengers...`, 'SUCCESS');
+
+    // Filter out leads that have absolutely no working/active messengers (WhatsApp, Telegram, VK, Viber)
+    const finalLeads = uniqueLeads.filter(l => {
+        return l.whatsapp !== 'N/A' || 
+               l.telegram !== 'N/A' || 
+               l.vk !== 'N/A' || 
+               l.viber !== 'N/A';
+    });
+
+    const removedNoMessenger = uniqueLeads.length - finalLeads.length;
+    log(`Filtered out ${removedNoMessenger} leads with non-working/inactive messenger contacts.`);
+    stats.total = finalLeads.length;
 
     // 1. Write back clean NDJSON database
-    const ndjsonOutput = uniqueLeads.map(l => JSON.stringify(l)).join('\n');
+    const ndjsonOutput = finalLeads.map(l => JSON.stringify(l)).join('\n');
     fs.writeFileSync(jsonPath, ndjsonOutput, 'utf8');
     log(`Updated original database cache: leads_temp.ndjson`);
 
     // 2. Write JSON
-    fs.writeFileSync(jsonOutputPath, JSON.stringify(uniqueLeads, null, 2), 'utf8');
+    fs.writeFileSync(jsonOutputPath, JSON.stringify(finalLeads, null, 2), 'utf8');
     log(`Saved clean JSON list to: leads_validated.json`);
 
     // 3. Write CSV
     const csvHeader = 'Name;Rating;Review Count;Phone;Website;Emails;WhatsApp;Telegram;Telegram Status;Viber;VK;VK Status;Facebook;Instagram;LinkedIn\n';
-    const csvRows = uniqueLeads.map(l => [
+    const csvRows = finalLeads.map(l => [
         l.name,
         l.rating || 'N/A',
         l.reviews || '0',
@@ -418,7 +469,7 @@ async function main() {
     log(`Saved CSV list to: leads_validated.csv`);
 
     // 4. Generate beautiful HTML report
-    const htmlReport = generateHTMLDashboard(uniqueLeads, stats);
+    const htmlReport = generateHTMLDashboard(finalLeads, stats);
     fs.writeFileSync(htmlOutputPath, htmlReport, 'utf8');
     log(`Saved gorgeous HTML report dashboard to: leads_validated.html`, 'SUCCESS');
 
