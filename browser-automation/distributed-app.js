@@ -1438,6 +1438,19 @@ async function startScrapeJob() {
                         const href = card.href;
                         if (!href) return;
                         const container = card.closest('div[role="article"]') || card.closest('.Nv2PK') || card.parentElement;
+                        
+                        // Filter out advertising cards (e.g. "Why this ad?", "Niyə bu reklam?")
+                        const text = (container ? container.textContent : card.textContent) || '';
+                        const textLower = text.toLowerCase();
+                        if (textLower.includes("reklam") || 
+                            textLower.includes("why this ad") || 
+                            textLower.includes("adchoices") || 
+                            textLower.includes("реклама") || 
+                            textLower.includes("about this ad") ||
+                            textLower.includes("sponsored") ||
+                            textLower.includes("advertisement")) {
+                            return;
+                        }
                         let rating = 'N/A', reviews = '0';
                         if (container) {
                             const spans = container.querySelectorAll('span');

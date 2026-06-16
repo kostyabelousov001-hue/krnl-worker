@@ -151,6 +151,19 @@
             var href = card.href;
             if (!href) return;
             var container = card.closest('div[role="article"]') || card.closest('.Nv2PK') || card.parentElement;
+            
+            // Filter out advertising cards (e.g. "Why this ad?", "Niyə bu reklam?")
+            var text = (container ? container.textContent : card.textContent) || '';
+            var textLower = text.toLowerCase();
+            if (textLower.includes("reklam") || 
+                textLower.includes("why this ad") || 
+                textLower.includes("adchoices") || 
+                textLower.includes("реклама") || 
+                textLower.includes("about this ad") ||
+                textLower.includes("sponsored") ||
+                textLower.includes("advertisement")) {
+                return;
+            }
             var rating = 'N/A', reviews = '0';
             if (container) {
                 var spans = container.querySelectorAll('span');
@@ -285,6 +298,19 @@
                         var href = card.href;
                         if (!href) return;
                         var container = card.closest('div[role="article"]') || card.closest('.Nv2PK') || card.parentElement;
+                        
+                        // Filter out advertising cards (e.g. "Why this ad?", "Niyə bu reklam?")
+                        var text = (container ? container.textContent : card.textContent) || '';
+                        var textLower = text.toLowerCase();
+                        if (textLower.includes("reklam") || 
+                            textLower.includes("why this ad") || 
+                            textLower.includes("adchoices") || 
+                            textLower.includes("реклама") || 
+                            textLower.includes("about this ad") ||
+                            textLower.includes("sponsored") ||
+                            textLower.includes("advertisement")) {
+                            return;
+                        }
                         var rating = 'N/A', reviews = '0';
                         if (container) {
                             var spans = container.querySelectorAll('span');
@@ -385,8 +411,23 @@
                 }
                 
                 var detailsJSON = await evaluateInPage(`(function() {
-                    var h1 = document.querySelector('h1.DUwDvf, h1');
-                    var name = h1 ? h1.textContent.trim() : 'N/A';
+                    var h1s = Array.from(document.querySelectorAll('h1.DUwDvf, h1'));
+                    var name = 'N/A';
+                    for (var i = 0; i < h1s.length; i++) {
+                        var text = h1s[i].textContent.trim();
+                        var tLower = text.toLowerCase();
+                        if (text.length > 1 && 
+                            !tLower.includes("reklam") && 
+                            !tLower.includes("why this ad") && 
+                            !tLower.includes("adchoices") && 
+                            !tLower.includes("реклама") && 
+                            !tLower.includes("about this ad") &&
+                            !tLower.includes("sponsored") &&
+                            !tLower.includes("advertisement")) {
+                            name = text;
+                            break;
+                        }
+                    }
                     
                     var phoneBtn = document.querySelector('button[data-item-id^="phone:tel:"] div.fontBodyMedium, button[data-item-id^="phone:"] div.fontBodyMedium');
                     var phone = phoneBtn ? phoneBtn.textContent.trim() : 'N/A';

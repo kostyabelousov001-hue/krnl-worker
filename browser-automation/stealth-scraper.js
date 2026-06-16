@@ -151,8 +151,22 @@ async function extractPlaceDetails(browser, input) {
         await page.waitForTimeout(300);
 
         const name = await page.evaluate(() => {
-            const h1 = document.querySelector('h1.DUwDvf, h1[class*="DUwDvf"], h1');
-            return (h1 && h1.textContent.trim().length > 1) ? h1.textContent.trim() : null;
+            const h1s = Array.from(document.querySelectorAll('h1.DUwDvf, h1[class*="DUwDvf"], h1'));
+            for (const h1 of h1s) {
+                const text = h1.textContent.trim();
+                const tLower = text.toLowerCase();
+                if (text.length > 1 && 
+                    !tLower.includes("reklam") && 
+                    !tLower.includes("why this ad") && 
+                    !tLower.includes("adchoices") && 
+                    !tLower.includes("реклама") && 
+                    !tLower.includes("about this ad") &&
+                    !tLower.includes("sponsored") &&
+                    !tLower.includes("advertisement")) {
+                    return text;
+                }
+            }
+            return null;
         }).catch(() => null);
 
         if (name && name.length > 1) {
