@@ -20,7 +20,7 @@ struct ContentView: View {
         .sheet(isPresented: $showSettings) { SettingsView() }
     }
 
-    @ViewBuilder @MainActor
+    @ToolbarContentBuilder
     var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
             HStack(spacing: 6) {
@@ -251,7 +251,7 @@ struct StatusIcon: Codable {
 }
 
 struct ItemConfig: Codable, Identifiable {
-    let id: String { key ?? label }
+    var id: String { key ?? label }
     let key: String?
     let label: String
     let icon: String

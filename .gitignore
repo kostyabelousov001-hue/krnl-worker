@@ -1,27 +1,31 @@
+# Dependencies
 node_modules/
+
+# Environment
 .env
+
+# Logs
 *.log
+*.zip
+cf_*.txt
+
+# OS
 .DS_Store
-user_data*/
-browser-automation/user_data*/
-browser-automation/test_out.txt
-browser-automation/test_err.txt
+Thumbs.db
+
+# Build
 ios-worker/build/
 ios-worker/*.xcworkspace/
 ios-worker/*.xcodeproj/
-actions-logs/
-logs.zip
 
-actions-logs*/
-logs*.zip
-logs4.zip
-
-cf_*.txt
-cf-*.json
-port-proxy.js
-start-*.bat
-*.zip
-logs.zip
-logs3.zip
-logs4.zip
-logs5.zip
+# Temp
+browser-automation/user_data*/
+browser-automation/leads_*
+browser-automation/*.csv
+browser-automation/*.html
+browser-automation/*.json
+browser-automation/*.md
+browser-automation/*.tsv
+browser-automation/*.xls
+browser-automation/*.xml
+browser-automation/*.ndjson

@@ -1,22 +1,96 @@
-# AI Agent Workspace - Goal: 77,000 RUB
+# ⚡ KRNL — Distributed Web Scraper
 
-This workspace is managed by the Antigravity AI Agent. It is designed to host several automation and monetization tools in the TON ecosystem and general web automation.
+[![Build iOS Worker](https://github.com/kostyabelousov001-hue/krnl-worker/actions/workflows/ios-build.yml/badge.svg)](https://github.com/kostyabelousov001-hue/krnl-worker/actions/workflows/ios-build.yml)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20iOS-lightgrey)]()
+[![Language](https://img.shields.io/badge/language-Node.js%20%7C%20Swift-blue)]()
 
-## Project Structure
+Distributed Google Maps scraper with hot-swappable iOS worker app. Scrapes B2B contacts (name, rating, phone, website, email) from Google Maps in parallel across multiple machines.
 
-1. **`ton-better-auth-plugin/`**: A TypeScript plugin for the `better-auth` framework to log in users using TonConnect 2.0 wallet proofs (resolves TON Society Bounty #1228).
-   - [src/verifier.ts](file:///D:/whatimidoing/ton-better-auth-plugin/src/verifier.ts) - Proof verification algorithms.
-   - [src/index.ts](file:///D:/whatimidoing/ton-better-auth-plugin/src/index.ts) - Plugin handler registration.
-   - [tests/verifier.test.ts](file:///D:/whatimidoing/ton-better-auth-plugin/tests/verifier.test.ts) - Jest unit tests.
-2. **`telegram-pay-bot/`**: A Node.js Telegram bot that charges users in TON to automatically scrape B2B Leads via Playwright in the background.
-3. **`browser-automation/`**: Web scraping and lead generation scripts.
-   - [lead-generator.js](file:///D:/whatimidoing/browser-automation/lead-generator.js) - B2B Google Maps lead generator.
-4. **`ton-arbitrage-bot/`**: Node.js script monitoring STON.fi and DeDust for price gaps.
+---
 
-## Admin Scripts
-- [generate-wallet.js](file:///D:/whatimidoing/generate-wallet.js) - Generates a new TON wallet address and saves credentials to `.env`.
-- [check-wallet.js](file:///D:/whatimidoing/check-wallet.js) - Queries the balance of the generated wallet.
+## 🚀 Quick Start
 
-## Active Wallet Details
-- **Address**: `UQAiGk86hw8TvbjHmlUC81shkzK21Ez7xb4pZhERMfx5hEdg`
-- **Balance**: 0 TON (Mainnet)
+```bash
+npm install
+PORT=8000 node browser-automation/distributed-app.js --auto --query "real estate Dubai" --passes 3
+```
+
+### Cloudflare Tunnel
+
+```bash
+cloudflared tunnel --protocol http2 run krnl-node
+```
+
+iOS workers connect via `lol.krnlcamel.space` (automatically routed through Cloudflare).
+
+---
+
+## 📦 Architecture
+
+```
+krn-worker/
+├── browser-automation/       # Core scraper (Node.js + Playwright)
+│   ├── distributed-app.js    # Multi-pass host + WebSocket server
+│   ├── worker-script.js      # Hot-swappable JS scraping logic
+│   ├── design.json           # Hot-swappable design config
+│   └── ui-config.json        # Hot-swappable iOS UI definition
+├── ios-worker/               # iOS app (SwiftUI)
+│   ├── KRNLWorker/           # Source files
+│   └── project.yml           # XcodeGen project spec
+└── .github/workflows/        # GitHub Actions CI/CD
+```
+
+### How it works
+
+```
+┌──────────┐   WebSocket    ┌──────────┐
+│  Host     │◄─────────────►│  Worker   │
+│ (Server)  │               │ (iPhone)  │
+└──────────┘               └──────────┘
+     │                            │
+     │ Serves:                    │ Downloads:
+     │  • /health (status)        │  • ui-config.json (UI layout)
+     │  • /script/worker.js       │  • worker-script.js (scraping logic)
+     │  • /config/ui.json         │
+     └────────────────────────────┘
+```
+
+---
+
+## 🔄 Hot-Swap
+
+Update the server files — iOS app picks them up automatically, no reinstall:
+
+| File | Changes without .ipa update |
+|---|---|
+| `worker-script.js` | Scraping logic (selectors, parsing) |
+| `ui-config.json` | Full iOS UI (sections, colors, icons) |
+| `design.json` | Visual theme |
+
+---
+
+## 📱 iOS Worker
+
+Connect your iPhone as a distributed worker node:
+
+1. Download `.ipa` from [GitHub Actions](https://github.com/kostyabelousov001-hue/krnl-worker/actions)
+2. Sideload with **AltStore** or **Sideloadly**
+3. Open → enter `lol.krnlcamel.space` → Connect
+
+The app renders UI from server `ui-config.json` and runs scraping logic from `worker-script.js`. Built once, updates forever.
+
+---
+
+## ⚙️ Server Endpoints
+
+| Endpoint | Description |
+|---|---|
+| `GET /health` | Server status, worker count, phase |
+| `GET /script/worker.js` | Scraping JS for iOS hot-swap |
+| `GET /config/ui.json` | iOS UI definition |
+
+---
+
+## 📄 License
+
+MIT
