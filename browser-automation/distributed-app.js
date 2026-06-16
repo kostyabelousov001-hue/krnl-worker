@@ -52,6 +52,14 @@ function log(msg) {
     const time = new Date().toLocaleTimeString();
     state.logs.push(`[${time}] ${msg}`);
     if (state.logs.length > 15) state.logs.shift();
+    broadcastToWorkers({ type: 'LOG', message: `[${time}] ${msg}` });
+}
+
+function broadcastToWorkers(data) {
+    const payload = JSON.stringify(data);
+    state.connectedWorkers.forEach(w => {
+        try { w.ws.send(payload); } catch (e) {}
+    });
 }
 
 // 🔥 Промежуточное сохранение → NDJSON (не конфликтует с Excel)
@@ -975,6 +983,12 @@ function dispatchNextWebTask(worker) {
     renderTUI();
 }
 
+function dispatchDiscoverTask(worker) {
+    worker.status = `Discovering: "${state.query}"`;
+    worker.ws.send(JSON.stringify({ type: 'TASK_DISCOVER', query: state.query, pass: state.currentPass, maxPasses: state.maxPasses }));
+    renderTUI();
+}
+
 // --- HOST WS SERVER (HTTP + WS for cloudflared) ---
 function startHostServer() {
     state.role = 'HOST';
@@ -1068,6 +1082,17 @@ function handleWorkerMessage(workerId, data) {
 
     if (data.type === 'STATUS') {
         worker.status = data.status;
+        renderTUI();
+    } else if (data.type === 'DISCOVERY_BATCH') {
+        const urls = data.urls || [];
+        const existingUrls = new Set(state.leads.map(l => l.url).filter(Boolean));
+        const newItems = urls.filter(u => !existingUrls.has(u.href)).map(u => ({ url: u.href, rating: u.rating || 'N/A', reviews: u.reviews || '0' }));
+        if (newItems.length > 0) {
+            state.detailsQueue.push(...newItems);
+            state.discoveredCount += newItems.length;
+            log(`Worker #${workerId}: +${newItems.length} new URLs (total discovered: ${state.discoveredCount})`);
+        }
+        dispatchDiscoverTask(worker);
         renderTUI();
     } else if (data.type === 'DETAILS_BATCH') {
         state.extractedCount += data.results.length;

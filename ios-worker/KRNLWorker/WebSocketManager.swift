@@ -1,5 +1,5 @@
 import Foundation
-import Network
+import AVFoundation
 
 class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate {
     @Published var isConnected = false
@@ -11,15 +11,37 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     @Published var workerStatus = "Idle"
     @Published var uiConfig: UIConfig?
     @Published var workerScript: String?
+    @Published var logEntries: [String] = []
 
     private var webSocket: URLSessionWebSocketTask?
     private var scraperEngine: ScraperEngine?
+    private var audioPlayer: AVAudioPlayer?
 
     override init() {
         super.init()
         if let saved = UserDefaults.standard.string(forKey: "host_url") {
             hostURL = saved
         }
+        startBackgroundAudio()
+    }
+
+    private func startBackgroundAudio() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: .mixWithOthers)
+            try AVAudioSession.sharedInstance().setActive(true)
+            let path = FileManager.default.temporaryDirectory.appendingPathComponent("silence.mp3")
+            if !FileManager.default.fileExists(atPath: path.path) {
+                let header = Data([0xFF, 0xFB, 0x90, 0x00])
+                let frame = Data(repeating: 0, count: 417)
+                var data = Data()
+                for _ in 0..<100 { data.append(header); data.append(frame) }
+                try data.write(to: path)
+            }
+            audioPlayer = try AVAudioPlayer(contentsOf: path)
+            audioPlayer?.numberOfLoops = -1
+            audioPlayer?.volume = 0
+            audioPlayer?.play()
+        } catch {}
     }
 
     func fetchConfigAndConnect() {
@@ -30,23 +52,19 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         UserDefaults.standard.set(hostURL, forKey: "host_url")
 
         let baseURL = "http://\(hostURL)"
-        let configTask = URLSession.shared.dataTask(with: URL(string: "\(baseURL)/config/ui.json")!) { [weak self] data, _, error in
+        URLSession.shared.dataTask(with: URL(string: "\(baseURL)/config/ui.json")!) { [weak self] data, _, _ in
             DispatchQueue.main.async {
                 if let data = data, let config = try? JSONDecoder().decode(UIConfig.self, from: data) {
                     self?.uiConfig = config
                 }
-                self?.workerStatus = "Connected"
                 self?.connectWebSocket()
             }
-        }
-        configTask.resume()
+        }.resume()
 
-        // Also fetch script in background
         URLSession.shared.dataTask(with: URL(string: "\(baseURL)/script/worker.js")!) { [weak self] data, _, _ in
             if let data = data { self?.workerScript = String(data: data, encoding: .utf8) }
         }.resume()
 
-        // Timeout: reset after 8 seconds if no connection
         DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
             if self?.isConnecting == true {
                 self?.isConnecting = false
@@ -62,7 +80,6 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
             workerStatus = "Invalid address"
             return
         }
-
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         webSocket = session.webSocketTask(with: url)
         webSocket?.resume()
@@ -77,6 +94,10 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
             self.isConnecting = false
             self.workerStatus = "Disconnected"
         }
+    }
+
+    func sendRaw(_ data: Data) {
+        webSocket?.send(.data(data)) { _ in }
     }
 
     func sendStatus(_ status: String) {
@@ -117,35 +138,43 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
             switch result {
             case .success(let message):
                 switch message {
-                case .data(let data):
-                    self.handleMessage(data)
+                case .data(let data): self.handleMessage(data)
                 case .string(let text):
-                    if let data = text.data(using: .utf8) {
-                        self.handleMessage(data)
-                    }
-                @unknown default:
-                    break
+                    if let data = text.data(using: .utf8) { self.handleMessage(data) }
+                @unknown default: break
                 }
                 self.receiveMessage()
             case .failure:
-                DispatchQueue.main.async {
-                    self.disconnect()
-                }
+                DispatchQueue.main.async { self.disconnect() }
             }
         }
     }
 
     private func handleMessage(_ data: Data) {
+        if let log = try? JSONDecoder().decode(LogMessage.self, from: data), log.type == "LOG" {
+            DispatchQueue.main.async {
+                self.logEntries.append(log.message)
+                if self.logEntries.count > 100 { self.logEntries.removeFirst(50) }
+            }
+            return
+        }
+
         guard let task = try? JSONDecoder().decode(WorkerTask.self, from: data) else {
             if let statusMsg = try? JSONDecoder().decode(StatusMessage.self, from: data) {
                 if statusMsg.type == "NO_MORE_TASKS" {
-                    DispatchQueue.main.async { self.workerStatus = "Waiting for tasks..." }
+                    DispatchQueue.main.async { self.workerStatus = "Waiting..." }
                 }
             }
             return
         }
 
         switch task.type {
+        case "TASK_DISCOVER":
+            let query = task.query ?? "business"
+            let pass = task.pass ?? 1
+            DispatchQueue.main.async { self.workerStatus = "Discovering pass \(pass)..." }
+            scraperEngine?.discover(query: query, pass: pass)
+
         case "TASK_DETAILS":
             if let items = task.items {
                 DispatchQueue.main.async { self.workerStatus = "Extracting \(items.count) places..." }
@@ -167,9 +196,7 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
 
     func sendDetailsBatch(_ results: [ScrapedPlace]) {
         let batch = DetailsBatch(type: "DETAILS_BATCH", results: results)
-        if let data = try? JSONEncoder().encode(batch) {
-            webSocket?.send(.data(data)) { _ in }
-        }
+        if let data = try? JSONEncoder().encode(batch) { webSocket?.send(.data(data)) { _ in } }
         DispatchQueue.main.async {
             self.tasksCompleted += 1
             self.leadsProcessed += results.count
@@ -179,9 +206,7 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
 
     func sendWebBatch(_ results: [ScrapedWebsite]) {
         let batch = WebBatch(type: "WEB_BATCH", results: results)
-        if let data = try? JSONEncoder().encode(batch) {
-            webSocket?.send(.data(data)) { _ in }
-        }
+        if let data = try? JSONEncoder().encode(batch) { webSocket?.send(.data(data)) { _ in } }
         DispatchQueue.main.async {
             self.tasksCompleted += 1
             self.leadsProcessed += results.count

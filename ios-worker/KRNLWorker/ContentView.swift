@@ -13,7 +13,7 @@ struct ContentView: View {
                     .toolbar { toolbarContent }
             } else {
                 PlaceholderView()
-                    .navigationTitle("KRNL Worker")
+                    .navigationTitle("Worker")
                     .toolbar { toolbarContent }
             }
         }
@@ -48,34 +48,68 @@ struct PlaceholderView: View {
                     .font(.system(size: 48))
                     .foregroundStyle(.secondary)
                 Text("Could not connect")
-                    .font(.title3)
-                    .fontWeight(.semibold)
+                    .font(.title3).fontWeight(.semibold)
                 Text("Check the address and try again")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                Button("Settings") { showSettings = true }
-                    .buttonStyle(.bordered)
-                    .padding(.top, 8)
-            } else if wsManager.workerStatus == "Connected" {
+                    .font(.subheadline).foregroundStyle(.secondary)
+                Button("Settings") { showSettings = true }.buttonStyle(.bordered).padding(.top, 8)
+            } else if wsManager.workerStatus == "Connected" || wsManager.workerStatus == "Ready" {
                 Image(systemName: "checkmark.circle")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.green)
-                Text("Connected, loading...")
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 48)).foregroundStyle(.green)
+                Text("Connected").foregroundStyle(.secondary)
+                if !wsManager.logEntries.isEmpty { LogPreviewView() }
             } else {
-                ProgressView()
-                    .controlSize(.large)
-                Text(wsManager.workerStatus)
-                    .foregroundStyle(.secondary)
-                Button("Settings") { showSettings = true }
-                    .buttonStyle(.bordered)
-                    .padding(.top, 8)
+                ProgressView().controlSize(.large)
+                Text(wsManager.workerStatus).foregroundStyle(.secondary)
+                Button("Settings") { showSettings = true }.buttonStyle(.bordered).padding(.top, 8)
             }
 
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .sheet(isPresented: $showSettings) { SettingsView() }
+    }
+}
+
+struct LogPreviewView: View {
+    @EnvironmentObject var wsManager: WebSocketManager
+
+    var body: some View {
+        NavigationLink(destination: LogView()) {
+            HStack {
+                Image(systemName: "list.bullet.rectangle")
+                Text("View Activity Log")
+                Spacer()
+                Text("\(wsManager.logEntries.count) entries")
+                    .foregroundStyle(.secondary).font(.caption)
+            }
+            .padding(12)
+            .background(.ultraThinMaterial)
+            .cornerRadius(10)
+        }
+        .padding(.horizontal)
+    }
+}
+
+struct LogView: View {
+    @EnvironmentObject var wsManager: WebSocketManager
+
+    var body: some View {
+        List {
+            ForEach(Array(wsManager.logEntries.reversed()), id: \.self) { entry in
+                Text(entry)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 2)
+            }
+        }
+        .navigationTitle("Activity Log")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Clear") { wsManager.logEntries.removeAll() }
+                    .font(.caption)
+            }
+        }
     }
 }
 
@@ -91,19 +125,42 @@ struct ServerDrivenList: View {
             ForEach(ui.sections, id: \.id) { section in
                 Section {
                     switch section.type {
-                    case "statusCard":
-                        StatusCardView(section: section)
-                    case "statsRow":
-                        StatsRowView(section: section)
-                    case "button":
-                        ButtonRowView(section: section, showSettings: $showSettings)
-                    case "info":
-                        InfoRowView(section: section)
-                    default:
-                        Text("Unknown: \(section.type)")
+                    case "statusCard": StatusCardView(section: section)
+                    case "statsRow": StatsRowView(section: section)
+                    case "button": ButtonRowView(section: section, showSettings: $showSettings)
+                    case "info": InfoRowView(section: section)
+                    case "log": LogSectionView()
+                    default: Text("Unknown: \(section.type)")
                     }
                 } header: {
                     Label(section.header, systemImage: section.headerIcon)
+                }
+            }
+        }
+    }
+}
+
+struct LogSectionView: View {
+    @EnvironmentObject var wsManager: WebSocketManager
+
+    var body: some View {
+        if wsManager.logEntries.isEmpty {
+            Text("No activity yet")
+                .foregroundStyle(.secondary)
+                .font(.caption)
+        } else {
+            NavigationLink(destination: LogView()) {
+                HStack {
+                    Text("Latest:")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(wsManager.logEntries.last ?? "")
+                        .font(.caption)
+                        .lineLimit(1)
+                    Spacer()
+                    Text("\(wsManager.logEntries.count)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
@@ -148,9 +205,7 @@ struct StatsRowView: View {
         HStack {
             ForEach(section.items ?? []) { item in
                 StatItemView(item: item)
-                if item.id != section.items?.last?.id {
-                    Divider()
-                }
+                if item.id != section.items?.last?.id { Divider() }
             }
         }
         .padding(.vertical, 8)
@@ -167,11 +222,9 @@ struct StatItemView: View {
                 .font(.title3)
                 .foregroundStyle(.tint)
             Text(boundValue)
-                .font(.headline)
-                .fontWeight(.semibold)
+                .font(.headline).fontWeight(.semibold)
             Text(item.label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                .font(.caption2).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
     }
@@ -182,6 +235,7 @@ struct StatItemView: View {
         case "leadsProcessed": return "\(wsManager.leadsProcessed)"
         case "workerStatus": return wsManager.workerStatus
         case "hostURL": return wsManager.hostURL
+        case "logCount": return "\(wsManager.logEntries.count)"
         default: return item.bind ?? item.value ?? ""
         }
     }
@@ -209,11 +263,9 @@ struct InfoRowView: View {
     var body: some View {
         ForEach(section.items ?? []) { item in
             HStack {
-                Text(item.label)
-                    .foregroundStyle(.primary)
+                Text(item.label).foregroundStyle(.primary)
                 Spacer()
-                Text(boundValue(for: item))
-                    .foregroundStyle(.secondary)
+                Text(boundValue(for: item)).foregroundStyle(.secondary)
             }
         }
     }
@@ -232,13 +284,10 @@ extension Color {
     init(hex: String) {
         let s = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         if let n = Int(s, radix: 16) {
-            let r = Double((n >> 16) & 0xFF) / 255
-            let g = Double((n >> 8) & 0xFF) / 255
-            let b = Double(n & 0xFF) / 255
-            self.init(red: r, green: g, blue: b)
-        } else {
-            self.init(.gray)
-        }
+            self.init(red: Double((n >> 16) & 0xFF) / 255,
+                      green: Double((n >> 8) & 0xFF) / 255,
+                      blue: Double(n & 0xFF) / 255)
+        } else { self.init(.gray) }
     }
 }
 
@@ -288,9 +337,7 @@ struct ItemConfig: Codable, Identifiable {
     let value: String?
     let bind: String?
 
-    enum CodingKeys: CodingKey {
-        case key, label, icon, value, bind
-    }
+    enum CodingKeys: CodingKey { case key, label, icon, value, bind }
 }
 
 struct ColorsConfig: Codable {

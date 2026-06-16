@@ -1,10 +1,12 @@
 import Foundation
 import WebKit
+import AVFoundation
 
 class ScraperEngine: NSObject {
     private weak var wsManager: WebSocketManager?
     private var webView: WKWebView?
     private var workerScript: String?
+    private var audioPlayer: AVAudioPlayer?
 
     init(wsManager: WebSocketManager, script: String?) {
         self.wsManager = wsManager
@@ -14,10 +16,85 @@ class ScraperEngine: NSObject {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .nonPersistent()
         webView = WKWebView(frame: .zero, configuration: config)
+
+        startBackgroundAudio()
+    }
+
+    private func startBackgroundAudio() {
+        guard let path = Bundle.main.path(forResource: "silence", ofType: "mp3") else {
+            var path = FileManager.default.temporaryDirectory
+            path.appendPathComponent("silence.mp3")
+            if !FileManager.default.fileExists(atPath: path.path) {
+                let silentData = Data(count: 44100)
+                try? silentData.write(to: path)
+            }
+            try? audioPlayer = AVAudioPlayer(contentsOf: path)
+            audioPlayer?.numberOfLoops = -1
+            audioPlayer?.volume = 0
+            audioPlayer?.play()
+            return
+        }
+        try? audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
+        audioPlayer?.numberOfLoops = -1
+        audioPlayer?.volume = 0
+        audioPlayer?.play()
     }
 
     private func evaluateJS(_ script: String, completion: @escaping (String?) -> Void) {
         webView?.evaluateJavaScript(script) { result, _ in completion(result as? String) }
+    }
+
+    func discover(query: String, pass: Int) {
+        guard let webView = webView else { return }
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+        guard let url = URL(string: "https://www.google.com/maps/search/\(encodedQuery)") else { return }
+
+        webView.load(URLRequest(url: url))
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            let js: String
+            if let s = self.workerScript {
+                js = "\(s); KRNL.extractLeadsFromList()"
+            } else {
+                js = """
+                    (function() {
+                        var results = [];
+                        var cards = document.querySelectorAll('a[href*="/maps/place/"]');
+                        cards.forEach(function(card) {
+                            var href = card.href;
+                            if (!href) return;
+                            var container = card.closest('div[role="article"]') || card.closest('.Nv2PK') || card.parentElement;
+                            var rating = 'N/A', reviews = '0';
+                            if (container) {
+                                var spans = container.querySelectorAll('span');
+                                for (var i = 0; i < spans.length; i++) {
+                                    var t = spans[i].textContent.trim().replace(',', '.');
+                                    var n = parseFloat(t);
+                                    if (!isNaN(n) && n >= 1.0 && n <= 5.0 && t.length <= 4 && !spans[i].querySelector('span')) {
+                                        rating = t; break;
+                                    }
+                                }
+                                var m = container.textContent.match(/\\((\\d[\\d\\s,.]*)\\)/);
+                                if (m) reviews = m[1].replace(/\\D/g, '');
+                            }
+                            results.push({ href: href, rating: rating, reviews: reviews });
+                        });
+                        return JSON.stringify(results);
+                    })()
+                """
+            }
+            self.evaluateJS(js) { json in
+                guard let data = json?.data(using: .utf8),
+                      let urls = try? JSONDecoder().decode([DiscoveredURL].self, from: data) else {
+                    self.wsManager?.workerStatus = "Discover failed"
+                    return
+                }
+                let batch = DiscoveryBatch(type: "DISCOVERY_BATCH", urls: urls.map { DiscoveryURL(href: $0.href, rating: $0.rating, reviews: $0.reviews) })
+                if let batchData = try? JSONEncoder().encode(batch) {
+                    self.wsManager?.sendRaw(batchData)
+                }
+            }
+        }
     }
 
     func extractDetails(_ items: [TaskItem]) {
@@ -115,3 +192,4 @@ class ScraperEngine: NSObject {
 
 struct PlaceJS: Codable { let name: String; let phone: String; let website: String }
 struct WebsiteJS_fast: Codable { let emails: String; let fb: String; let ig: String; let li: String }
+struct DiscoveredURL: Codable { let href: String; let rating: String; let reviews: String }

@@ -35,6 +35,12 @@
       ]
     },
     {
+      "id": "activity",
+      "header": "Activity",
+      "headerIcon": "list.bullet.rectangle",
+      "type": "log"
+    },
+    {
       "id": "connection",
       "header": "Connection",
       "headerIcon": "globe",

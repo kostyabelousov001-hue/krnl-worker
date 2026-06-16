@@ -1,8 +1,10 @@
 import Foundation
-import Network
 
 struct WorkerTask: Codable {
     let type: String
+    let query: String?
+    let pass: Int?
+    let maxPasses: Int?
     let items: [TaskItem]?
     let leads: [LeadItem]?
 }
@@ -28,6 +30,11 @@ struct StatusMessage: Codable {
     let status: String
 }
 
+struct LogMessage: Codable {
+    let type: String
+    let message: String
+}
+
 struct DetailsBatch: Codable {
     let type: String
     let results: [ScrapedPlace]
@@ -36,6 +43,17 @@ struct DetailsBatch: Codable {
 struct WebBatch: Codable {
     let type: String
     let results: [ScrapedWebsite]
+}
+
+struct DiscoveryBatch: Codable {
+    let type: String
+    let urls: [DiscoveryURL]
+}
+
+struct DiscoveryURL: Codable {
+    let href: String
+    let rating: String
+    let reviews: String
 }
 
 struct ScrapedPlace: Codable {
@@ -58,9 +76,4 @@ struct ScrapedWebsite: Codable {
     let facebook: String
     let instagram: String
     let linkedin: String
-}
-
-struct WorkerConfig: Codable {
-    var hostURL: String
-    var port: String
 }
