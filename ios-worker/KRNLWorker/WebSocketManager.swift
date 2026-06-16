@@ -13,16 +13,35 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     @Published var workerScript: String?
     @Published var logEntries: [String] = []
 
+    // Universal Configuration Properties
+    @Published var searchWebsites = true
+    @Published var useWebKit = true
+    @Published var crawlPercentage: Double = 1.0 // 1.0 = 100%
+    @Published var configServerURL = ""
+
     private var webSocket: URLSessionWebSocketTask?
     private var scraperEngine: ScraperEngine?
     private var audioPlayer: AVAudioPlayer?
 
     override init() {
         super.init()
-        if let saved = UserDefaults.standard.string(forKey: "host_url") {
-            hostURL = saved
-        }
+        hostURL = UserDefaults.standard.string(forKey: "host_url") ?? "lol.krnlcamel.space:9090"
+        searchWebsites = UserDefaults.standard.object(forKey: "search_websites") as? Bool ?? true
+        useWebKit = UserDefaults.standard.object(forKey: "use_webkit") as? Bool ?? true
+        
+        let savedPercentage = UserDefaults.standard.double(forKey: "crawl_percentage")
+        crawlPercentage = savedPercentage == 0 ? 1.0 : savedPercentage
+        configServerURL = UserDefaults.standard.string(forKey: "config_server_url") ?? ""
+        
         startBackgroundAudio()
+    }
+
+    func saveSettings() {
+        UserDefaults.standard.set(hostURL, forKey: "host_url")
+        UserDefaults.standard.set(searchWebsites, forKey: "search_websites")
+        UserDefaults.standard.set(useWebKit, forKey: "use_webkit")
+        UserDefaults.standard.set(crawlPercentage, forKey: "crawl_percentage")
+        UserDefaults.standard.set(configServerURL, forKey: "config_server_url")
     }
 
     private func startBackgroundAudio() {
@@ -49,7 +68,7 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
         isConnecting = true
         workerStatus = "Connecting..."
 
-        UserDefaults.standard.set(hostURL, forKey: "host_url")
+        saveSettings()
 
         let baseURL = "http://\(hostURL)"
         URLSession.shared.dataTask(with: URL(string: "\(baseURL)/config/ui.json")!) { [weak self] data, _, _ in
@@ -102,7 +121,13 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
 
     func sendStatus(_ status: String) {
         guard let ws = webSocket, isConnected else { return }
-        let msg = StatusMessage(type: "STATUS", status: status)
+        let settings = WorkerSettings(
+            searchWebsites: searchWebsites,
+            useWebKit: useWebKit,
+            crawlPercentage: crawlPercentage,
+            configServerURL: configServerURL
+        )
+        let msg = StatusMessage(type: "STATUS", status: status, settings: settings)
         if let data = try? JSONEncoder().encode(msg) {
             ws.send(.data(data)) { _ in }
         }

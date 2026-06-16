@@ -537,12 +537,31 @@
                 state.connectedWorkers.forEach(w => {
                     const el = document.createElement('div');
                     el.className = 'worker-item';
+                    
+                    let settingsHtml = '';
+                    if (w.settings) {
+                        const s = w.settings;
+                        settingsHtml = `
+                            <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+                                <span style="font-size: 9px; padding: 2px 6px; background: ${s.searchWebsites ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)'}; color: ${s.searchWebsites ? 'var(--green)' : 'var(--red)'}; border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">🌐 Search: ${s.searchWebsites ? 'ON' : 'OFF'}</span>
+                                <span style="font-size: 9px; padding: 2px 6px; background: rgba(99, 102, 241, 0.12); color: var(--accent); border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">📦 ${s.useWebKit ? 'WebKit' : 'HTTP Fast'}</span>
+                                <span style="font-size: 9px; padding: 2px 6px; background: rgba(245, 158, 11, 0.12); color: var(--yellow); border-radius: 4px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">📊 Limit: ${Math.round(s.crawlPercentage * 100)}%</span>
+                                ${s.configServerURL ? `<span style="font-size: 9px; padding: 2px 6px; background: rgba(255,255,255,0.05); color: var(--text-secondary); border-radius: 4px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; max-width: 120px; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">⚙️ ${s.configServerURL.replace(/^https?:\/\//, '')}</span>` : ''}
+                            </div>
+                        `;
+                    }
+
                     el.innerHTML = `
-                        <div>
-                            <div class="worker-id">Worker #${w.id}</div>
-                            <div class="worker-ip">${w.ip}</div>
+                        <div style="width: 100%; display: flex; flex-direction: column;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <div>
+                                    <div class="worker-id">Worker #${w.id}</div>
+                                    <div class="worker-ip">${w.ip}</div>
+                                </div>
+                                <div class="worker-status">${w.status}</div>
+                            </div>
+                            ${settingsHtml}
                         </div>
-                        <div class="worker-status">${w.status}</div>
                     `;
                     workersList.appendChild(el);
                 });

@@ -72,7 +72,12 @@ function sendStateToUIs() {
             speedSec: state.speedSec,
             speedMin: state.speedMin,
             leadsCount: state.leads.length,
-            connectedWorkers: state.connectedWorkers.map(w => ({ id: w.id, ip: w.ip, status: w.status }))
+            connectedWorkers: state.connectedWorkers.map(w => ({ 
+                id: w.id, 
+                ip: w.ip, 
+                status: w.status,
+                settings: w.settings || null
+            }))
         }
     });
 }
@@ -1177,6 +1182,9 @@ function handleWorkerMessage(workerId, data) {
 
     if (data.type === 'STATUS') {
         worker.status = data.status;
+        if (data.settings) {
+            worker.settings = data.settings;
+        }
         renderTUI();
     } else if (data.type === 'DISCOVERY_BATCH') {
         const urls = data.urls || [];

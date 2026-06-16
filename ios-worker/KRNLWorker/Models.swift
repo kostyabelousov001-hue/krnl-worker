@@ -28,6 +28,14 @@ struct LeadItem: Codable {
 struct StatusMessage: Codable {
     let type: String
     let status: String
+    let settings: WorkerSettings?
+}
+
+struct WorkerSettings: Codable {
+    let searchWebsites: Bool
+    let useWebKit: Bool
+    let crawlPercentage: Double
+    let configServerURL: String
 }
 
 struct LogMessage: Codable {

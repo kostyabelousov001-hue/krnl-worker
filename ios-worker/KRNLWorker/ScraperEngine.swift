@@ -131,6 +131,13 @@ class ScraperEngine: NSObject {
         guard let webView = webView else { return }
         var results: [ScrapedWebsite] = []
         
+        let searchEnabled = wsManager?.searchWebsites ?? true
+        let percentage = wsManager?.crawlPercentage ?? 1.0
+        let useWebKitEnabled = wsManager?.useWebKit ?? true
+        
+        // Calculate how many items we should actually crawl
+        let crawlLimit = Int(Double(leads.count) * percentage)
+        
         func processNext(index: Int) {
             guard index < leads.count else {
                 self.wsManager?.sendWebBatch(results)
@@ -139,9 +146,11 @@ class ScraperEngine: NSObject {
             
             let lead = leads[index]
             let website = lead.website ?? "N/A"
-            guard website != "N/A" else {
+            
+            // Skip crawling completely if website is N/A, search is disabled, or we are past the crawl percentage limit
+            if website == "N/A" || !searchEnabled || index >= crawlLimit {
                 results.append(ScrapedWebsite(name: lead.name, rating: lead.rating ?? "N/A",
-                    reviews: lead.reviews ?? "0", phone: lead.phone ?? "N/A", website: "N/A",
+                    reviews: lead.reviews ?? "0", phone: lead.phone ?? "N/A", website: website,
                     url: lead.url ?? "", emails: "N/A", facebook: "N/A", instagram: "N/A", linkedin: "N/A"))
                 processNext(index: index + 1)
                 return
@@ -149,6 +158,75 @@ class ScraperEngine: NSObject {
             
             var targetURL = website
             if !targetURL.hasPrefix("http") { targetURL = "http://" + targetURL }
+            
+            // Case 1: Lightweight HTTP crawl using URLSession (No WebKit rendering)
+            if !useWebKitEnabled {
+                guard let url = URL(string: targetURL) else {
+                    results.append(ScrapedWebsite(name: lead.name, rating: lead.rating ?? "N/A",
+                        reviews: lead.reviews ?? "0", phone: lead.phone ?? "N/A", website: website,
+                        url: lead.url ?? "", emails: "N/A", facebook: "N/A", instagram: "N/A", linkedin: "N/A"))
+                    processNext(index: index + 1)
+                    return
+                }
+                
+                let sessionConfig = URLSessionConfiguration.default
+                sessionConfig.timeoutIntervalForRequest = 4.0
+                sessionConfig.timeoutIntervalForResource = 4.0
+                let session = URLSession(configuration: sessionConfig)
+                
+                session.dataTask(with: url) { [weak self] data, _, _ in
+                    guard let self = self else { return }
+                    var em = "N/A"
+                    var fb = "N/A"
+                    var ig = "N/A"
+                    var li = "N/A"
+                    
+                    if let data = data, let html = String(data: data, encoding: .utf8) {
+                        // Regex extract emails
+                        let emailRegex = try? NSRegularExpression(pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", options: [])
+                        let matches = emailRegex?.matches(in: html, options: [], range: NSRange(location: 0, length: html.utf16.count)) ?? []
+                        var emailsSet = Set<String>()
+                        for m in matches {
+                            if let range = Range(m.range, in: html) {
+                                let email = String(html[range])
+                                let ext = email.components(separatedBy: ".").last?.lowercased() ?? ""
+                                if !["png", "jpg", "jpeg", "gif", "svg", "webp", "css", "js"].contains(ext) {
+                                    emailsSet.insert(email)
+                                }
+                            }
+                        }
+                        if !emailsSet.isEmpty {
+                            em = emailsSet.joined(separator: ", ")
+                        }
+                        
+                        // Regex extract socials
+                        let patterns = [
+                            "facebook.com": #"https?://(?:www\.)?facebook\.com/[a-zA-Z0-9._-]+"#,
+                            "instagram.com": #"https?://(?:www\.)?instagram\.com/[a-zA-Z0-9._-]+"#,
+                            "linkedin.com": #"https?://(?:www\.)?linkedin\.com/company/[a-zA-Z0-9._-]+"#
+                        ]
+                        for (key, pattern) in patterns {
+                            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+                               let firstMatch = regex.firstMatch(in: html, options: [], range: NSRange(location: 0, length: html.utf16.count)),
+                               let range = Range(firstMatch.range, in: html) {
+                                let link = String(html[range])
+                                if key == "facebook.com" { fb = link }
+                                else if key == "instagram.com" { ig = link }
+                                else if key == "linkedin.com" { li = link }
+                            }
+                        }
+                    }
+                    
+                    results.append(ScrapedWebsite(name: lead.name, rating: lead.rating ?? "N/A",
+                        reviews: lead.reviews ?? "0", phone: lead.phone ?? "N/A", website: website,
+                        url: lead.url ?? "", emails: em, facebook: fb, instagram: ig, linkedin: li))
+                    
+                    processNext(index: index + 1)
+                }.resume()
+                return
+            }
+            
+            // Case 2: Full browser rendering in WebKit
             guard let url = URL(string: targetURL) else {
                 processNext(index: index + 1)
                 return
@@ -189,7 +267,6 @@ class ScraperEngine: NSObject {
         
         processNext(index: 0)
     }
-}
 
 struct PlaceJS: Codable { let name: String; let phone: String; let website: String }
 struct WebsiteJS_fast: Codable { let emails: String; let fb: String; let ig: String; let li: String }
