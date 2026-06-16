@@ -13,13 +13,10 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     @Published var workerScript: String?
 
     private var webSocket: URLSessionWebSocketTask?
-    private let session: URLSession
     private var scraperEngine: ScraperEngine?
 
     override init() {
-        session = URLSession(configuration: .default)
         super.init()
-
         if let saved = UserDefaults.standard.string(forKey: "host_url") {
             hostURL = saved
         }
@@ -28,66 +25,48 @@ class WebSocketManager: NSObject, ObservableObject, URLSessionWebSocketDelegate 
     func fetchConfigAndConnect() {
         guard !isConnected, !isConnecting else { return }
         isConnecting = true
-        workerStatus = "Fetching config..."
+        workerStatus = "Connecting..."
 
         UserDefaults.standard.set(hostURL, forKey: "host_url")
 
-        let baseURL = "https://\(hostURL)"
-        let group = DispatchGroup()
-
-        group.enter()
-        fetchJSON(from: "\(baseURL)/config/ui.json") { [weak self] (config: UIConfig?) in
-            DispatchQueue.main.async { self?.uiConfig = config }
-            group.leave()
+        let baseURL = "http://\(hostURL)"
+        let configTask = URLSession.shared.dataTask(with: URL(string: "\(baseURL)/config/ui.json")!) { [weak self] data, _, error in
+            DispatchQueue.main.async {
+                if let data = data, let config = try? JSONDecoder().decode(UIConfig.self, from: data) {
+                    self?.uiConfig = config
+                }
+                self?.workerStatus = "Connected"
+                self?.connectWebSocket()
+            }
         }
+        configTask.resume()
 
-        group.enter()
-        fetchScript(from: "\(baseURL)/script/worker.js") { [weak self] script in
-            DispatchQueue.main.async { self?.workerScript = script }
-            group.leave()
-        }
+        // Also fetch script in background
+        URLSession.shared.dataTask(with: URL(string: "\(baseURL)/script/worker.js")!) { [weak self] data, _, _ in
+            if let data = data { self?.workerScript = String(data: data, encoding: .utf8) }
+        }.resume()
 
-        group.notify(queue: .main) { [weak self] in
-            self?.workerStatus = "Connecting..."
-            self?.connectWebSocket()
+        // Timeout: reset after 8 seconds if no connection
+        DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
+            if self?.isConnecting == true {
+                self?.isConnecting = false
+                self?.workerStatus = "Connection failed"
+            }
         }
     }
 
     private func connectWebSocket() {
-        let urlStr = "wss://\(hostURL)"
+        let urlStr = "ws://\(hostURL)"
         guard let url = URL(string: urlStr) else {
             isConnecting = false
-            workerStatus = "Invalid URL"
+            workerStatus = "Invalid address"
             return
         }
 
+        let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         webSocket = session.webSocketTask(with: url)
-        webSocket?.delegate = self
         webSocket?.resume()
         receiveMessage()
-    }
-
-    private func fetchJSON<T: Decodable>(from urlString: String, completion: @escaping (T?) -> Void) {
-        guard let url = URL(string: urlString) else { completion(nil); return }
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data = data, error == nil,
-                  let decoded = try? JSONDecoder().decode(T.self, from: data) else {
-                completion(nil)
-                return
-            }
-            completion(decoded)
-        }.resume()
-    }
-
-    private func fetchScript(from urlString: String, completion: @escaping (String?) -> Void) {
-        guard let url = URL(string: urlString) else { completion(nil); return }
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data = data, let script = String(data: data, encoding: .utf8), error == nil else {
-                completion(nil)
-                return
-            }
-            completion(script)
-        }.resume()
     }
 
     func disconnect() {

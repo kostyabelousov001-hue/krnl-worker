@@ -37,15 +37,45 @@ struct ContentView: View {
 
 struct PlaceholderView: View {
     @EnvironmentObject var wsManager: WebSocketManager
+    @State private var showSettings = false
 
     var body: some View {
         VStack(spacing: 16) {
-            ProgressView()
-                .controlSize(.large)
-            Text("Loading...")
-                .foregroundStyle(.secondary)
+            Spacer()
+
+            if wsManager.workerStatus == "Connection failed" {
+                Image(systemName: "wifi.slash")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
+                Text("Could not connect")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                Text("Check the address and try again")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Button("Settings") { showSettings = true }
+                    .buttonStyle(.bordered)
+                    .padding(.top, 8)
+            } else if wsManager.workerStatus == "Connected" {
+                Image(systemName: "checkmark.circle")
+                    .font(.system(size: 48))
+                    .foregroundStyle(.green)
+                Text("Connected, loading...")
+                    .foregroundStyle(.secondary)
+            } else {
+                ProgressView()
+                    .controlSize(.large)
+                Text(wsManager.workerStatus)
+                    .foregroundStyle(.secondary)
+                Button("Settings") { showSettings = true }
+                    .buttonStyle(.bordered)
+                    .padding(.top, 8)
+            }
+
+            Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .sheet(isPresented: $showSettings) { SettingsView() }
     }
 }
 
